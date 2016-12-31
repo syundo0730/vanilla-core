@@ -4,14 +4,14 @@
 #include <ostream>
 #include <map>
 #include "Eigen/Dense"
+#include "physical_const.h"
  
 template <class T>
 class WalkGenerator
 {
-    typedef Eigen::Vector2d Coodinate;
-    typedef std::map<int, Coodinate, std::less<int>, Eigen::aligned_allocator<std::pair<const int, Coodinate> > > CoodinateMap;
  
 private:
+    typedef std::map<int, Eigen::Vector2d, std::less<int>, Eigen::aligned_allocator<std::pair<const int, Eigen::Vector2d> > > Vector2dMap;
     T Tsup;
     T z_c;
     T Tc;
@@ -19,47 +19,52 @@ private:
     T S;
     T g;
     int n_steps;
-    CoodinateMap walk_param;
-    CoodinateMap leg_param;
-    CoodinateMap target_x, target_v;
-    CoodinateMap target_x_leg;
-    CoodinateMap xi, vi;
+    Vector2dMap walk_param;
+    Vector2dMap leg_param;
+    Vector2dMap target_x, target_v;
+    Vector2dMap target_x_leg;
+    Vector2dMap xi, vi;
  
-    CoodinateMap pf_n;
-    CoodinateMap vf_n;
+    Vector2dMap pf_n;
+    Vector2dMap vf_n;
  
 public:
-    WalkGenerator(int n) : g(9.80665), n_steps(n) {}
+    WalkGenerator(int n) : n_steps(n) {}
  
 public:
     /**
      * 定数の初期化
     **/
-    void setInitialParam(T _Tsup, T _z_c, const Coodinate &xi0) {
+    void setInitialParam(T _Tsup, T _z_c, const Eigen::Vector2d &xi0) {
         Tsup = _Tsup;
         z_c = _z_c;
+        using Physic::g;
         Tc = sqrt(z_c / g);
         C = cosh(Tsup / Tc);
         S = sinh(Tsup / Tc);
 		// initial poistion and velocity
         xi[0] = xi0;
 		vi[0] = calcTargetVelocity(
-			Coodinate(
+			Eigen::Vector2d(
 				0.5 * walk_param[1][0],
 				-0.5 * walk_param[1][1]
 			)
 		);
     }
+
+    Eigen::Vector2d getLegPosition(int n) {
+        return target_x_leg[n];
+    }
  
     /**
      * 歩行素片の設定
     **/
-    void setWalkParam(int n, const Coodinate &param) {
+    void setWalkParam(int n, const Eigen::Vector2d &param) {
         walk_param[n] = param;
     }
  
     void execOptimization(T a, T b) {
-        initLegParam(Coodinate(0, -0.1));
+        initLegParam(Eigen::Vector2d(0, -0.1));
         initTarget();
         initTargetLeg(a, b);
     }
@@ -78,10 +83,10 @@ public:
         }
     }
     //重心位置の解析解(p.130)
-    std::pair<Coodinate, Coodinate> calcCogTrajectory(T t, int n) {
+    std::pair<Eigen::Vector2d, Eigen::Vector2d> calcCogTrajectory(T t, int n) {
         T cosht = cosh(t/Tc);
         T sinht = sinh(t/Tc);
-        return std::pair<Coodinate, Coodinate> (
+        return std::pair<Eigen::Vector2d, Eigen::Vector2d> (
                     (xi[n] - target_x_leg[n])*cosht + Tc*vi[n]*sinht + target_x_leg[n],
                     (xi[n] - target_x_leg[n])/Tc*sinht + vi[n]*cosht
         );
@@ -89,7 +94,7 @@ public:
  
 private:
     //歩行パラメタから求まる着地位置(p.128)
-    void initLegParam(const Coodinate &inilegp){
+    void initLegParam(const Eigen::Vector2d &inilegp){
         leg_param[0] = inilegp;
         for (int n = 1; n <= n_steps; ++n) {
             auto sy = (n%2 == 0) ? -walk_param[n][1] : walk_param[n][1];
@@ -102,14 +107,14 @@ private:
         for (int n = 0; n <= n_steps; ++n) {
             T x = walk_param[n+1][0] * 0.5;
             T y = (n % 2 == 0) ? 0.5 * walk_param[n+1][1] : -0.5 * walk_param[n+1][1];
-            auto p = Coodinate(x, y);
+            auto p = Eigen::Vector2d(x, y);
             target_x[n] = leg_param[n] + p;
             target_v[n] = calcTargetVelocity(p);
         }
     }
     //歩行素片から終端位置，速度を求める
-    Coodinate calcTargetVelocity(const Coodinate &p) {
-        return Coodinate ( (C + 1) * p[0] / (Tc*S),
+    Eigen::Vector2d calcTargetVelocity(const Eigen::Vector2d &p) {
+        return Eigen::Vector2d ( (C + 1) * p[0] / (Tc*S),
                 (C - 1) * p[1] / (Tc*S) );
     }
  
