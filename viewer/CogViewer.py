@@ -34,7 +34,7 @@ def main():
 	(x, y, lx, ly, cx, cy) = load()
 	plt.plot(x, y, 'o-')
 	plt.plot(lx, ly, 'o')
-	plt.plot(cx, cy, 'o-')
+	plt.plot(cx, cy, '*-')
 	plt.show()
 
 if __name__ == '__main__':
