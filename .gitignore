@@ -1,4 +1,9 @@
 thirdparty
 *.o
 central/central_controller
+central/build
+central/test/build
 *.csv
+cross-compile-dev-env
+viewer/local
+viewer/temp-plot.html

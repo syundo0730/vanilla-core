@@ -1,2 +1,11 @@
 # vanila-core
 The core controller of biped robot "Vanila".
+
+# build
+```
+$ cd central
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make
+```

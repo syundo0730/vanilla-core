@@ -1,0 +1,95 @@
+cmake_minimum_required(VERSION 2.8)
+set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-c++)
+project (VanillaCore)
+
+add_definitions("-Wall -std=c++14")
+
+set(THIRDPARTY ${CMAKE_SOURCE_DIR}/../thirdparty)
+
+include_directories(
+  ${THIRDPARTY}/eigen
+  ${THIRDPARTY}/boost/stage/include
+  ${THIRDPARTY}/mraa/include
+  ${THIRDPARTY}/websocketpp
+  ${THIRDPARTY}/json
+  ${THIRDPARTY}/yaml-cpp/include
+)
+include_directories(
+  src
+  src/api
+  src/api/i2c
+  src/api/i2c/I2Cdev
+  src/api/i2c/mpu
+  src/api/i2c/mpu/mpu6050
+  src/api/i2c/pwmdriver
+  src/api/serial
+  src/api/serial/servo
+  src/api/serial/servo/futaba
+  src/api/websocket
+  src/api/websocket/rosbridge
+  src/common
+  src/conf
+  src/controller
+  src/controller/walk
+  src/model
+  src/model/machine
+  src/model/machine/joint
+  src/model/machine/joint/conf
+  src/model/machine/leg
+  src/model/sensor
+  src/model/sensor/motion
+  src/model/sensor/motion/filter
+  src/model/sensor/motion/mpu6050
+  src/model/walk
+  src/model/walk/lip
+  src/model/walk/stabilizer
+  src/model/walk/swing
+)
+
+link_directories(
+  ${THIRDPARTY}/libs/boost/arm
+  ${THIRDPARTY}/libs/mraa/arm
+  ${THIRDPARTY}/libs/yaml-cpp/arm
+)
+
+add_executable(Main
+  src/api/i2c/I2Cdev/I2Cdev.cpp
+  src/api/i2c/mpu/mpu6050/MPU6050.cpp
+  src/api/i2c/mpu/mpu6050/MPU6050_6Axis_MotionApps20.cpp
+  src/api/i2c/pwmdriver/Adafruit_PWMServoDriver.cpp
+  src/api/serial/SerialApi.cpp
+  src/api/serial/servo/futaba/RSApi.cpp
+  src/api/websocket/rosbridge/ROSBridgeApi.cpp
+  src/api/websocket/WebsocketApi.cpp
+  src/common/Ticker.cpp
+  src/common/Timer.cpp
+  src/common/utility.cpp
+  src/conf/conf.cpp
+  src/controller/CommandBus.cpp
+  src/controller/CommandParser.cpp
+  src/controller/MainController.cpp
+  src/controller/walk/WalkController.cpp
+  src/Dependency.cpp
+  src/main.cpp
+  src/model/machine/joint/conf/JointConf.cpp
+  src/model/machine/joint/JointAngle.cpp
+  src/model/machine/joint/JointRepository.cpp
+  src/model/machine/leg/LegControlService.cpp
+  src/model/machine/leg/LegKinematics.cpp
+  src/model/sensor/motion/filter/MadgwickQuaternionFilter.cpp
+  src/model/sensor/motion/MotionSensor.cpp
+  src/model/sensor/motion/mpu6050/MPU6050_DMP.cpp
+  src/model/walk/lip/LinearInvertedPendulum.cpp
+  src/model/walk/stabilizer/CPStabilizer.cpp
+  src/model/walk/swing/SwingLegTrajectory.cpp
+  src/model/walk/WalkGenerator.cpp
+)
+
+target_link_libraries(Main
+  boost_system
+  mraa
+  pthread
+  yaml-cpp
+)
+
+message(STATUS "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")

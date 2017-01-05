@@ -1,0 +1,83 @@
+cp_stabilizer:
+  omega: 0.1
+  time_shift: 0.1
+leg_kinematics:
+  l1: 0.045
+  l2: 0.09
+  leg_root_left: [0, 0.03, -0.05]
+  leg_root_right: [0, -0.03, -0.05]
+serial_port:
+  port_path: '/dev/ttyS0'
+  baud_rate: 115200
+system:
+  interval_sec: 0.01
+  g_acceleration: 9.81
+walk:
+  default_z_c: 0.8
+  default_t_sup: 0.8
+  prediction_step_num: 3
+  default_target_horizontal_step_length: 0.2
+  default_target_longitudinal_step_length: 0
+joint:
+  id_map:
+    ll0: 0
+    ll1: 1
+    ll2: 2
+    ll3: 3
+    ll4: 4
+    ll5: 5
+    lr0: 6
+    lr1: 7
+    lr2: 8
+    lr3: 9
+    lr4: 10
+    lr5: 11
+  setting_map:
+    0:
+      motor_type: 0
+      real_id: 0
+      offset: 0
+    1:
+      motor_type: 0
+      real_id: 1
+      offset: 1
+    2:
+      motor_type: 0
+      real_id: 2
+      offset: 2
+    3:
+      motor_type: 0
+      real_id: 3
+      offset: 3
+    4:
+      motor_type: 1
+      real_id: 0
+      offset: 0
+    5:
+      motor_type: 1
+      real_id: 1
+      offset: 1
+    6:
+      motor_type: 1
+      real_id: 2
+      offset: 2
+    7:
+      motor_type: 1
+      real_id: 3
+      offset: 3
+    8:
+      motor_type: 2
+      real_id: 4
+      offset: 0
+    9:
+      motor_type: 2
+      real_id: 5
+      offset: 1
+    10:
+      motor_type: 2
+      real_id: 6
+      offset: 2
+    11:
+      motor_type: 2
+      real_id: 7
+      offset: 3

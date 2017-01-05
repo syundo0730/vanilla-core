@@ -1,0 +1,70 @@
+@startuml
+class CommandBus {
+	- subscribers
+	void subscribe(Subscriber subscriber)
+	void publish(Command command)
+}
+class MainController {
+	void update()
+}
+class WalkController {
+	- left_leg_controll_service
+	- ritght_leg_controll_service
+	void update()
+}
+class WalkGenerator {
+	- double Tsup;
+	- double z_c;
+	- double time, dt;
+	- bool is_first_step, will_stop;
+	- const int prediction_step_num;
+	- const double cp_time_shift;
+	- LinearInvertedPendulum linear_inverted_pendulum;
+	- CPStabilizer stablizer;
+	void reset();
+	void update();
+	WalkState getState();
+	void generateTargetTrajectory( bool _is_first_step, double _target_longitudinal_step_length, double _target_horizontal_step_length)
+}
+class LegControllService {
+	void setPosition(Position p)
+}
+class LinearInvertedPendulum{
+	- double Tsup
+	- double z_c
+	- double Tc
+	- double C
+	- double S
+	- int n_steps
+	- Vector2dMap walk_param
+	- Vector2dMap leg_param
+	- Vector2dMap target_x
+	- Vector2dMap target_v
+	- Vector2dMap target_x_leg
+	- Vector2dMap xi
+	- Vector2dMap vi
+	- Vector2dMap pf_n
+	- Vector2dMap vf_n
+	- LegSide supporting_leg_side;
+	- void initLegParamAndTarget(Eigen::Vector2d, Eigen::Vector2d, Eigen::Vector2d, LegSide)
+	- calcTargetVelocity(const Eigen::Vector2d &p)
+	- std::pair<Eigen::Vector2d, Eigen::Vector2d> calcCogTrajectory(double, int)
+	void setInitialParam(double, double)
+	void setupFirstStep(Vector2dMap, LegSide)
+	void switchToNextStep(Vector2dMap)
+	void optimize(double, double)
+	LIPState getState(double, int)
+}
+MainController *.. WalkController
+MainController -> CommandBus
+WalkController -> CommandBus
+MainController *.. JointRepository
+WalkController *.. LegControllService
+WalkController *.. WalkGenerator
+JointRepository *.. Joint
+Joint *.. JointAngle
+WalkGenerator *.. LinearInvertedPendulum
+WalkGenerator *.. SwingLegTrajectory
+WalkGenerator *.. CPStabilizer
+LegControllService *.. LegKinematics
+@endum

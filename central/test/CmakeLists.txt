@@ -1,0 +1,94 @@
+cmake_minimum_required(VERSION 2.8)
+set(CMAKE_CXX_COMPILER /usr/bin/g++)
+set(CMAKE_C_COMPILER /usr/bin/gcc)
+project (VanillaCoreTest)
+
+add_definitions("-Wall -std=c++14")
+
+set(SRC ${CMAKE_SOURCE_DIR}/../src)
+set(THIRDPARTY ${CMAKE_SOURCE_DIR}/../../thirdparty)
+set(GTEST_ROOT ${THIRDPARTY}/googletest)
+
+include_directories(
+  ${GTEST_ROOT}/googletest/include
+  ${GTEST_ROOT}/googlemock/include
+)
+include_directories(
+  ${THIRDPARTY}/eigen
+  ${THIRDPARTY}/boost/stage/include
+  ${THIRDPARTY}/mraa/include
+  ${THIRDPARTY}/websocketpp
+  ${THIRDPARTY}/json
+  ${THIRDPARTY}/yaml-cpp/include
+)
+include_directories(
+  mock
+  ${SRC}
+  ${SRC}/api
+  ${SRC}/api/i2c
+  ${SRC}/api/i2c/I2Cdev
+  ${SRC}/api/i2c/mpu
+  ${SRC}/api/i2c/mpu/mpu6050
+  ${SRC}/api/i2c/pwmdriver
+  ${SRC}/api/serial
+  ${SRC}/api/serial/servo
+  ${SRC}/api/serial/servo/futaba
+  ${SRC}/api/websocket
+  ${SRC}/api/websocket/rosbridge
+  ${SRC}/common
+  ${SRC}/conf
+  ${SRC}/controller
+  ${SRC}/controller/walk
+  ${SRC}/model
+  ${SRC}/model/machine
+  ${SRC}/model/machine/joint
+  ${SRC}/model/machine/joint/conf
+  ${SRC}/model/machine/leg
+  ${SRC}/model/sensor
+  ${SRC}/model/sensor/motion
+  ${SRC}/model/sensor/motion/filter
+  ${SRC}/model/sensor/motion/mpu6050
+  ${SRC}/model/walk
+  ${SRC}/model/walk/lip
+  ${SRC}/model/walk/stabilizer
+  ${SRC}/model/walk/swing
+)
+
+link_directories(
+  ${GTEST_ROOT}/build/googlemock
+  ${GTEST_ROOT}/build/googlemock/gtest
+  ${THIRDPARTY}/libs/yaml-cpp/x86
+)
+
+add_executable(Test
+  ${SRC}/common/utility.cpp
+  ${SRC}/conf/conf.cpp
+  ${SRC}/controller/walk/WalkController.cpp
+  ${SRC}/controller/CommandBus.cpp
+  ${SRC}/controller/CommandParser.cpp
+  ${SRC}/model/machine/leg/LegControlService.cpp
+  ${SRC}/model/machine/leg/LegKinematics.cpp
+  ${SRC}/model/machine/joint/JointAngle.cpp
+  ${SRC}/model/machine/joint/JointRepository.cpp
+  ${SRC}/model/walk/WalkGenerator.cpp
+  ${SRC}/model/walk/lip/LinearInvertedPendulum.cpp
+  ${SRC}/model/walk/stabilizer/CPStabilizer.cpp
+  ${SRC}/model/walk/swing/SwingLegTrajectory.cpp
+  ConfTest.cpp
+  CommandParserTest.cpp
+  CPStabilizerTest.cpp
+  WalkGeneratorTest.cpp
+  LegControlServiceTest.cpp
+  LegKinematicsTest.cpp
+  JointRepositoryTest.cpp
+  WalkControllerTest.cpp
+)
+
+target_link_libraries(Test
+  gtest_main
+  gtest
+  gmock_main
+  gmock
+  pthread
+  yaml-cpp
+)
