@@ -38,6 +38,9 @@ class JointRepositoryImpl : public JointRepository
 	void setTargetJointAngle(int id, JointAngle angle) override
 	{
 		jointMap[id].setTargetAngle(angle);
+		// TODO: current angle is asumed to be same as target angle for now
+		// we should implement real angle feedback
+		setCurrentJointAngle(id, angle);
 	}
 	JointAngle getCurrentJointAngle(int id) override
 	{

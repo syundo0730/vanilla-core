@@ -10,7 +10,9 @@
 enum class CommandType
 {
 	WalkStart,
-	WalkStop
+	WalkStop,
+	MotionStart,
+	MotionStop,
 };
 
 struct Command

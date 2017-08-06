@@ -1,0 +1,19 @@
+motions:
+  -
+    id: 1
+    poses:
+      -
+        interval: 765
+        joint_angles_deci_degree: "1,2,3,4,5"
+      -
+        interval: 876
+        joint_angles_deci_degree: "1,4,1,4,2"
+  -
+    id: 2
+    poses:
+      -
+        interval: 346
+        joint_angles_deci_degree: "1,7,3,2,0"
+      -
+        interval: 315
+        joint_angles_deci_degree: "1,1,4,5,1"

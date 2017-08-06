@@ -39,11 +39,13 @@ include_directories(
   ${SRC}/conf
   ${SRC}/controller
   ${SRC}/controller/walk
+  ${SRC}/controller/motion
   ${SRC}/model
   ${SRC}/model/machine
   ${SRC}/model/machine/joint
   ${SRC}/model/machine/joint/conf
   ${SRC}/model/machine/leg
+  ${SRC}/model/motion
   ${SRC}/model/sensor
   ${SRC}/model/sensor/motion
   ${SRC}/model/sensor/motion/filter
@@ -64,12 +66,15 @@ add_executable(Test
   ${SRC}/common/utility.cpp
   ${SRC}/conf/conf.cpp
   ${SRC}/controller/walk/WalkController.cpp
+  ${SRC}/controller/motion/MotionController.cpp
   ${SRC}/controller/CommandBus.cpp
   ${SRC}/controller/CommandParser.cpp
   ${SRC}/model/machine/leg/LegControlService.cpp
   ${SRC}/model/machine/leg/LegKinematics.cpp
   ${SRC}/model/machine/joint/JointAngle.cpp
   ${SRC}/model/machine/joint/JointRepository.cpp
+  ${SRC}/model/motion/MotionLoader.cpp
+  ${SRC}/model/motion/MotionService.cpp
   ${SRC}/model/walk/WalkGenerator.cpp
   ${SRC}/model/walk/lip/LinearInvertedPendulum.cpp
   ${SRC}/model/walk/stabilizer/CPStabilizer.cpp
@@ -82,6 +87,9 @@ add_executable(Test
   LegKinematicsTest.cpp
   JointRepositoryTest.cpp
   WalkControllerTest.cpp
+  MotionLoaderTest.cpp
+  MotionServiceTest.cpp
+  MotionControllerTest.cpp
 )
 
 target_link_libraries(Test
