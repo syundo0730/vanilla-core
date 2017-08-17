@@ -30,12 +30,14 @@ include_directories(
   src/common
   src/conf
   src/controller
+  src/controller/motion
   src/controller/walk
   src/model
   src/model/machine
   src/model/machine/joint
   src/model/machine/joint/conf
   src/model/machine/leg
+  src/model/motion
   src/model/sensor
   src/model/sensor/motion
   src/model/sensor/motion/filter
@@ -68,6 +70,9 @@ add_executable(Main
   src/controller/CommandBus.cpp
   src/controller/CommandParser.cpp
   src/controller/MainController.cpp
+  src/controller/motion/MotionController.cpp
+  src/controller/StdIOCommandParser.cpp
+  src/controller/StdIORouter.cpp
   src/controller/walk/WalkController.cpp
   src/Dependency.cpp
   src/main.cpp
@@ -76,6 +81,8 @@ add_executable(Main
   src/model/machine/joint/JointRepository.cpp
   src/model/machine/leg/LegControlService.cpp
   src/model/machine/leg/LegKinematics.cpp
+  src/model/motion/MotionLoader.cpp
+  src/model/motion/MotionService.cpp
   src/model/sensor/motion/filter/MadgwickQuaternionFilter.cpp
   src/model/sensor/motion/MotionSensor.cpp
   src/model/sensor/motion/mpu6050/MPU6050_DMP.cpp

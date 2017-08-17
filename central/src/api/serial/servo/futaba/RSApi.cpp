@@ -43,6 +43,9 @@ class RSApiImpl : public RSApi
     {
         serial_api.write(makePacket(0xFF, 0, 0x24, 0x00));
     }
+    void setID(uint8_t currentID, uint8_t targetID) override
+    {
+    }
 };
 
 std::unique_ptr<RSApi> RSApi::instantiate(SerialApi& serialApi) {

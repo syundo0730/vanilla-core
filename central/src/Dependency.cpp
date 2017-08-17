@@ -18,6 +18,8 @@
 #include "CPStabilizer.h"
 #include "WalkGenerator.h"
 #include "WalkController.h"
+#include "StdIOCommandParser.h"
+#include "StdIORouter.h"
 #include "conf.h"
 
 class DependencyImpl : public Dependency
@@ -45,6 +47,9 @@ class DependencyImpl : public Dependency
 	std::unique_ptr<WalkGenerator> walkGenerator;
 	std::unique_ptr<WalkController> walkController;
 	std::unique_ptr<MainController> mainController;
+
+	std::unique_ptr<StdIOCommandParser> stdIOCommandParser;
+	std::unique_ptr<StdIORouter> stdIORouter;
 
   public:
 	DependencyImpl()
@@ -74,13 +79,20 @@ class DependencyImpl : public Dependency
 		  walkController(WalkController::instantiate(
 			  *commandBus, *walkGenerator, *legControlService)),
 		  mainController(MainController::instantiate(
-			  *jointRepository, *walkController, *motionSensor, *commandBus, *commandParser))
+			  *jointRepository, *walkController, *motionSensor, *commandBus, *commandParser)),
+		  stdIOCommandParser(StdIOCommandParser::instantiate()),
+		  stdIORouter(StdIORouter::instantiate(*commandBus, *stdIOCommandParser))
 	{
 	}
 
 	MainController *getMainController() override
 	{
 		return mainController.get();
+	}
+
+	StdIORouter *getStdIORouter() override
+	{
+		return stdIORouter.get();
 	}
 };
 

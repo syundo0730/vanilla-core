@@ -14,6 +14,7 @@ class RSApi
 	virtual void sendPosition(uint8_t id, uint16_t pos) = 0;
 	virtual void on() = 0;
 	virtual void off() = 0;
+    virtual void setID(uint8_t currentID, uint8_t targetID) = 0;
 };
 
 std::vector<uint8_t> makePacket(uint8_t id, uint8_t flag, uint8_t adr, uint8_t cnt, std::vector<uint8_t> &data);

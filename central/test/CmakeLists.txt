@@ -69,6 +69,7 @@ add_executable(Test
   ${SRC}/controller/motion/MotionController.cpp
   ${SRC}/controller/CommandBus.cpp
   ${SRC}/controller/CommandParser.cpp
+  ${SRC}/controller/StdIOCommandParser.cpp
   ${SRC}/model/machine/leg/LegControlService.cpp
   ${SRC}/model/machine/leg/LegKinematics.cpp
   ${SRC}/model/machine/joint/JointAngle.cpp
@@ -90,6 +91,7 @@ add_executable(Test
   MotionLoaderTest.cpp
   MotionServiceTest.cpp
   MotionControllerTest.cpp
+  stdIOCommandParserTest.cpp
 )
 
 target_link_libraries(Test
