@@ -2,6 +2,7 @@
 #include "dimensional_types.h"
 #include "JointRepository.h"
 #include "WalkController.h"
+#include "MotionController.h"
 #include "MotionSensor.h"
 #include "CommandBus.h"
 #include "CommandParser.h"
@@ -13,6 +14,7 @@ class MainControllerImpl : public MainController
   private:
 	JointRepository &joint_repository;
 	WalkController &walk_controller;
+	MotionController &motionController;
 	MotionSensor &motion_sensor;
 	CommandBus &command_bus;
 	CommandParser &commandParser;
@@ -21,11 +23,13 @@ class MainControllerImpl : public MainController
 	MainControllerImpl(
 		JointRepository &joint_repository,
 		WalkController &walk_controller,
+		MotionController &motionController,
 		MotionSensor &motion_sensor,
 		CommandBus &command_bus,
 		CommandParser &commandParser)
 		: joint_repository(joint_repository),
 		  walk_controller(walk_controller),
+		  motionController(motionController),
 		  motion_sensor(motion_sensor),
 		  command_bus(command_bus),
 		  commandParser(commandParser)
@@ -33,8 +37,9 @@ class MainControllerImpl : public MainController
 	}
 	void update() override
 	{
-		// update walk
 		walk_controller.update();
+		motionController.update();
+		joint_repository.applyTargetAngle();
 
 		// // get motion state
 		// auto q = motion_sensor.getQuaternion();
@@ -62,6 +67,7 @@ class MainControllerImpl : public MainController
 std::unique_ptr<MainController> MainController::instantiate(
 	JointRepository &jointRepository,
 	WalkController &walkController,
+	MotionController &motionController,
 	MotionSensor &motionSensor,
 	CommandBus &commandBus,
 	CommandParser &commandParser)
@@ -69,6 +75,7 @@ std::unique_ptr<MainController> MainController::instantiate(
 	return std::make_unique<MainControllerImpl>(
 		jointRepository,
 		walkController,
+		motionController,
 		motionSensor,
 		commandBus,
 		commandParser);

@@ -1,5 +1,6 @@
 #include "StdIORouter.h"
 #include "StdIOCommandParser.h"
+#include <iostream>
 
 class StdIORouterImpl : public StdIORouter
 {
@@ -15,6 +16,7 @@ class StdIORouterImpl : public StdIORouter
     void route() override
     {
         auto command = commandParser.parse(std::cin);
+        std::cout << "parsed" << std::endl;
         commandBus.publish(command);
     }
 };

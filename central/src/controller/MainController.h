@@ -4,6 +4,7 @@
 #include <memory>
 class JointRepository;
 class WalkController;
+class MotionController;
 class MotionSensor;
 class CommandBus;
 class CommandParser;
@@ -14,6 +15,7 @@ class MainController
 	static std::unique_ptr<MainController> instantiate(
 		JointRepository &,
 		WalkController &,
+		MotionController &,
 		MotionSensor &,
 		CommandBus &,
 		CommandParser &);

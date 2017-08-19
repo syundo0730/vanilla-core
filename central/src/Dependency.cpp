@@ -18,6 +18,9 @@
 #include "CPStabilizer.h"
 #include "WalkGenerator.h"
 #include "WalkController.h"
+#include "MotionLoader.h"
+#include "MotionService.h"
+#include "MotionController.h"
 #include "StdIOCommandParser.h"
 #include "StdIORouter.h"
 #include "conf.h"
@@ -46,6 +49,9 @@ class DependencyImpl : public Dependency
 	std::unique_ptr<CPStabilizer> cpStabilizer;
 	std::unique_ptr<WalkGenerator> walkGenerator;
 	std::unique_ptr<WalkController> walkController;
+	std::unique_ptr<MotionLoader> motionLoader;
+	std::unique_ptr<MotionService> motionService;
+	std::unique_ptr<MotionController> motionController;
 	std::unique_ptr<MainController> mainController;
 
 	std::unique_ptr<StdIOCommandParser> stdIOCommandParser;
@@ -78,8 +84,13 @@ class DependencyImpl : public Dependency
 			  *linearInvertedPendulum, *swingLegTrajectory, *cpStabilizer, *conf)),
 		  walkController(WalkController::instantiate(
 			  *commandBus, *walkGenerator, *legControlService)),
+		  motionLoader(MotionLoader::instantiate()),
+		  motionService(MotionService::instantiate(
+			  *motionLoader, *jointRepository, *conf)),
+		  motionController(MotionController::instantiate(
+			  *commandBus, *motionService)),
 		  mainController(MainController::instantiate(
-			  *jointRepository, *walkController, *motionSensor, *commandBus, *commandParser)),
+			  *jointRepository, *walkController, *motionController, *motionSensor, *commandBus, *commandParser)),
 		  stdIOCommandParser(StdIOCommandParser::instantiate()),
 		  stdIORouter(StdIORouter::instantiate(*commandBus, *stdIOCommandParser))
 	{
