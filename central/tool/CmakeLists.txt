@@ -1,0 +1,35 @@
+cmake_minimum_required(VERSION 2.8)
+set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-c++)
+project (VanillaCoreTool)
+
+add_definitions("-Wall -std=c++14")
+
+set(SRC ${CMAKE_SOURCE_DIR}/../src)
+set(THIRDPARTY ${CMAKE_SOURCE_DIR}/../../thirdparty)
+
+include_directories(
+  ${THIRDPARTY}/boost/stage/include
+)
+include_directories(
+  ${SRC}
+  ${SRC}/api/serial
+  ${SRC}/api/serial/servo
+  ${SRC}/api/serial/servo/futaba
+  ${SRC}/common
+)
+
+link_directories(
+  ${THIRDPARTY}/libs/boost/arm
+)
+
+add_executable(Tool
+  ${SRC}/api/serial/SerialApi.cpp
+  ${SRC}/api/serial/servo/futaba/RSApi.cpp
+  ${SRC}/common/Timer.cpp
+  main.cpp
+)
+
+target_link_libraries(Tool
+  boost_system
+  pthread
+)

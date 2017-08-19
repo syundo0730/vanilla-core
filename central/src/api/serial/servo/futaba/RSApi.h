@@ -15,8 +15,12 @@ class RSApi
 	virtual void on() = 0;
 	virtual void off() = 0;
     virtual void setID(uint8_t currentID, uint8_t targetID) = 0;
+    virtual void setAllID(uint8_t targetID) = 0;
+    virtual void writeToROM(uint8_t id) = 0;
+    virtual void reboot(uint8_t id) = 0;
 };
 
+std::vector<uint8_t> makeFlagPacket(uint8_t id, uint8_t flag, uint8_t len);
 std::vector<uint8_t> makePacket(uint8_t id, uint8_t flag, uint8_t adr, uint8_t cnt, std::vector<uint8_t> &data);
 std::vector<uint8_t> makePacket(uint8_t id, uint8_t flag, uint8_t adr, uint8_t data);
 

@@ -45,11 +45,43 @@ class RSApiImpl : public RSApi
     }
     void setID(uint8_t currentID, uint8_t targetID) override
     {
+        serial_api.write(makePacket(currentID, 0, 0x04, targetID));
+    }
+    void setAllID(uint8_t targetID) override
+    {
+        serial_api.write(makePacket(0xFF, 0, 0x04, targetID));
+    }
+    void writeToROM(uint8_t id) {
+        serial_api.write(makeFlagPacket(id, 0x40, 0x00));
+    }
+    void reboot(uint8_t id) {
+        serial_api.write(makeFlagPacket(id, 0x20, 0x00));
     }
 };
 
 std::unique_ptr<RSApi> RSApi::instantiate(SerialApi& serialApi) {
     return std::make_unique<RSApiImpl>(serialApi);
+}
+
+std::vector<uint8_t> makeFlagPacket(uint8_t id, uint8_t flag, uint8_t len)
+{
+    std::vector<uint8_t> buf;
+    buf.push_back(0xFA);              //Header :H
+    buf.push_back(0xAF);              //Header :L
+    buf.push_back(id);                //id
+    buf.push_back(flag);              //flag
+    buf.push_back(0xFF);              //adress // this is fixed to 0xFF in case of flag packet
+    buf.push_back(len);               //len
+    buf.push_back(0x00);              //count // this is fixed to 0x00 in case of flag packet
+
+    uint8_t sum = buf[2]; //check sum from id to data
+    for (int i = 3, size = buf.size(); i < size; ++i)
+    {
+        sum = sum ^ buf[i];
+    }
+    buf.push_back(sum);
+
+    return buf;
 }
 
 std::vector<uint8_t> makePacket(uint8_t id, uint8_t flag, uint8_t adr, uint8_t cnt, std::vector<uint8_t> &data)

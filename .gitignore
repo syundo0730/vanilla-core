@@ -3,6 +3,7 @@ thirdparty
 central/central_controller
 central/build
 central/test/build
+central/tool/build
 *.csv
 cross-compile-dev-env
 viewer/local
