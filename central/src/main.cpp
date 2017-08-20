@@ -13,7 +13,11 @@ int main()
 	auto stdIORouter = dependency->getStdIORouter();
 	try {
 		std::thread th([&]{
-			stdIORouter->route();
+			std::cout << "waiting command" << std::endl;
+			while(true) {
+				std::cout << "Enter command:" << std::endl;
+				stdIORouter->route();
+			}
 		});
 		th.join();
 	} catch (std::exception &ex) {
