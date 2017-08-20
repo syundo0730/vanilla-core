@@ -1,7 +1,10 @@
 #include "Ticker.h"
 #include "Dependency.h"
 #include "MainController.h"
+#include "SerialApi.h"
 #include <iostream>
+#include <functional>
+#include <memory>
 #include <thread>
 #include <exception>
 
@@ -9,7 +12,7 @@ int main()
 {
 	auto dependency = Dependency::instantiate();
 
-	// command watch loop
+	// command watch thread
 	auto stdIORouter = dependency->getStdIORouter();
 	try {
 		std::thread th([&]{
@@ -24,8 +27,21 @@ int main()
 		std::cerr << ex.what() << std::endl;
 	}
 
-	// control loop
 	auto controller = dependency->getMainController();
+
+	// bluetooth command watch thread
+	auto bluetooth = std::make_unique<SerialApi>("hoge", 115200);
+	// SerialApi::Listener listener = [](const uint8_t* data, std::size_t size) {
+	// 	controller->route(data, size);
+	// };
+	// bluetooth->setListener(listener);
+	bluetooth->setListener(std::bind(
+		&MainController::route,
+		controller,
+		std::placeholders::_1,
+		std::placeholders::_2));
+
+	// control loop
 	Ticker ticker(10, std::bind(&MainController::update, controller));
 	ticker.start();
 }

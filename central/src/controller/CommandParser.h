@@ -7,7 +7,7 @@
 class CommandParser {
   public:
     static std::unique_ptr<CommandParser> instantiate();
-    virtual Command parse(const uint8_t *data, int length) = 0;
+    virtual Command parse(const uint8_t *data, std::size_t length) = 0;
 };
 
 #endif

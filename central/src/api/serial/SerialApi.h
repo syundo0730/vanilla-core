@@ -4,11 +4,12 @@
 #include <boost/asio.hpp>
 #include <vector>
 #include <string>
+#include <cstdint>
 
 class SerialApi
 {
 public:
-	using Listener = std::function<void(char *)>;
+	using Listener = std::function<void(const uint8_t *, std::size_t)>;
 
 private:
 	std::unique_ptr<boost::asio::io_service> io;

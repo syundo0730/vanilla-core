@@ -51,11 +51,11 @@ class MainControllerImpl : public MainController
 		// std::cout << newPos(1) << "\t";		 //pitch
 		// std::cout << newPos(2) << std::endl; //yaw
 	}
-	void route(const char *data, int length) override
+	void route(const uint8_t *data, std::size_t length) override
 	{
 		Command cmd;
 		try {
-			cmd = commandParser.parse((uint8_t*)data, length);
+			cmd = commandParser.parse(data, length);
 		} catch (const std::runtime_error& e) {
 			std::cout << e.what() << std::endl;
 			return;

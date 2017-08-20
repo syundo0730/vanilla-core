@@ -9,7 +9,7 @@ class CommandParserImpl : public CommandParser
 {
   public:
     CommandParserImpl() {}
-    Command parse(const uint8_t *data, int length) override
+    Command parse(const uint8_t *data, std::size_t length) override
     {
         if (length < 3)
         {
@@ -53,7 +53,7 @@ class CommandParserImpl : public CommandParser
     {
         return h == 0xFA && l == 0xAF;
     }
-    bool validateCheckSum(const uint8_t *data, int length)
+    bool validateCheckSum(const uint8_t *data, std::size_t length)
     {
         uint8_t sum = data[2];
         int last = length - 1;

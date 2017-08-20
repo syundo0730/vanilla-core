@@ -1,6 +1,7 @@
 #include "SerialApi.h"
 #include <iostream>
 #include <functional>
+#include <thread>
 #include <boost/bind.hpp>
 #include <boost/array.hpp>
 
@@ -36,11 +37,6 @@ SerialApi::~SerialApi()
 
 void SerialApi::write(std::vector<unsigned char> arg)
 {
-    // for (auto it = arg.begin(); it != arg.end(); ++it) {
-    // 	std::cout << "0x" << std::setw(2) << std::setfill('0') << std::hex << (int)*it;
-    // 	std::cout << " | ";
-    // }
-    // std::cout << std::endl;
     std::string str(arg.begin(), arg.end());
     port->write_some(boost::asio::buffer(str));
 }
@@ -48,13 +44,14 @@ void SerialApi::write(std::vector<unsigned char> arg)
 void SerialApi::setListener(Listener listener)
 {
     // thread for reading
-    // boost::thread thr_io(boost::bind(&boost::asio::io_service::run, io));
+    std::thread thr_io(boost::bind(&boost::asio::io_service::run, io.get()));
+    thr_io.join();
 
-    boost::array<char, 64> rbuf;
+    boost::array<uint8_t, 128> rbuf;
     std::function<void(const boost::system::error_code, std::size_t)> onRead = [&](
         const boost::system::error_code &e,
         std::size_t size) {
-        listener("hoge");
+        listener(rbuf.data(), size);
         port->async_read_some(boost::asio::buffer(rbuf), onRead);
     };
     port->async_read_some(boost::asio::buffer(rbuf), onRead);
