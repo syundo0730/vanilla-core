@@ -24,6 +24,7 @@ class JointRepositoryImpl : public JointRepository
 		  pwmapi(pwmapi),
 		  settingMap(conf.Joint.SettingMap)
 	{
+		resetTargetJointAngles();
 		// power on rs servo motors
 		rsapi.on();
 		// start pwm
@@ -68,6 +69,18 @@ class JointRepositoryImpl : public JointRepository
 			}
 		}
 		rsapi.sendMultiPosition(rsIDs, rsPositions);
+	}
+
+  private:
+	void resetTargetJointAngles()
+	{
+		for (const auto &kv : settingMap)
+		{
+			auto id = kv.first;
+			auto angle = JointAngle(0);
+			setTargetJointAngle(id, angle);
+			setCurrentJointAngle(id, angle);
+		}
 	}
 };
 
