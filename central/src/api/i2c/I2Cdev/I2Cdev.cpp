@@ -143,7 +143,14 @@ int8_t I2Cdev::readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8
 
 int8_t I2Cdev::readWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint16_t *data, uint16_t timeout)
 {
-    return 0;
+    uint8_t readLength = length * 2;
+    uint8_t* readData = new uint8_t[readLength];
+    int8_t res = readBytes(devAddr, regAddr, readLength, readData, timeout);
+    for (int i = 0; i < length; ++i) {
+        data[i] = (uint16_t)readData[2*i] << 8
+            | (uint16_t)readData[2*i+1];
+    }
+    return res;
 }
 
 /** write a single bit in an 8-bit device register.
@@ -252,7 +259,7 @@ bool I2Cdev::writeWord(uint8_t devAddr, uint8_t regAddr, uint16_t data) {
     return writeWords(devAddr, regAddr, 1, &data);
 }
 
-bool I2Cdev::writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data)
+bool I2Cdev::writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, const uint8_t *data)
 {
 	uint8_t* writeData = new uint8_t[length + 1];
 	writeData[0] = regAddr;
@@ -265,9 +272,15 @@ bool I2Cdev::writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_
 	return res == mraa::Result::SUCCESS;
 }
 
-bool I2Cdev::writeWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint16_t *data)
+bool I2Cdev::writeWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, const uint16_t *data)
 {
-    return true;
+    uint8_t writeLength = length * 2;
+    uint8_t* writeData = new uint8_t[writeLength];
+    for (int i = 0; i < length; ++i) {
+        writeData[2*i] = (data[i] >> 8);
+        writeData[2*i+1] = data[i];
+    }
+    return writeBytes(devAddr, regAddr, writeLength, writeData);
 }
 
 uint16_t I2Cdev::readTimeout(void)

@@ -4,6 +4,7 @@
 namespace timer
 {
 void waitMs(int ms);
+unsigned long millis();
 }
 
 #endif

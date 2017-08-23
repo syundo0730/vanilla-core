@@ -1,7 +1,8 @@
 #ifndef VL53L0X_h
 #define VL53L0X_h
 
-#include <Arduino.h>
+#include <cstdint>
+#include "I2Cdev.h"
 
 class VL53L0X
 {
@@ -96,7 +97,7 @@ class VL53L0X
 
     uint8_t last_status; // status of last I2C transmission
 
-    VL53L0X(void);
+    VL53L0X(I2Cdev&);
 
     void setAddress(uint8_t new_addr);
     inline uint8_t getAddress(void) { return address; }
@@ -138,7 +139,7 @@ class VL53L0X
 
     struct SequenceStepEnables
     {
-      boolean tcc, msrc, dss, pre_range, final_range;
+      bool tcc, msrc, dss, pre_range, final_range;
     };
 
     struct SequenceStepTimeouts
@@ -150,6 +151,7 @@ class VL53L0X
     };
 
     uint8_t address;
+    I2Cdev &i2cdev;
     uint16_t io_timeout;
     bool did_timeout;
     uint16_t timeout_start_ms;

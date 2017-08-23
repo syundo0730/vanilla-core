@@ -33,8 +33,8 @@ class I2Cdev {
         bool writeBitsW(uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint8_t length, uint16_t data);
         bool writeByte(uint8_t devAddr, uint8_t regAddr, uint8_t data);
         bool writeWord(uint8_t devAddr, uint8_t regAddr, uint16_t data);
-        bool writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data);
-        bool writeWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint16_t *data);
+        bool writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, const uint8_t *data);
+        bool writeWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, const uint16_t *data);
 
         static uint16_t readTimeout(void);
 };

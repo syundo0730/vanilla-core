@@ -4,7 +4,7 @@
 // VL53L0X datasheet.
 
 #include <VL53L0X.h>
-#include <Wire.h>
+#include <Timer.h>
 
 // Defines /////////////////////////////////////////////////////////////////////
 
@@ -13,10 +13,10 @@
 #define ADDRESS_DEFAULT 0b0101001
 
 // Record the current time to check an upcoming timeout against
-#define startTimeout() (timeout_start_ms = millis())
+#define startTimeout() (timeout_start_ms = timer::millis())
 
 // Check if timeout is enabled (set to nonzero value) and has expired
-#define checkTimeoutExpired() (io_timeout > 0 && ((uint16_t)millis() - timeout_start_ms) > io_timeout)
+#define checkTimeoutExpired() (io_timeout > 0 && ((uint16_t)timer::millis() - timeout_start_ms) > io_timeout)
 
 // Decode VCSEL (vertical cavity surface emitting laser) pulse period in PCLKs
 // from register value
@@ -34,8 +34,9 @@
 
 // Constructors ////////////////////////////////////////////////////////////////
 
-VL53L0X::VL53L0X(void)
+VL53L0X::VL53L0X(I2Cdev& i2cdev)
   : address(ADDRESS_DEFAULT)
+  , i2cdev(i2cdev)
   , io_timeout(0) // no timeout
   , did_timeout(false)
 {
@@ -281,46 +282,33 @@ bool VL53L0X::init(bool io_2v8)
 // Write an 8-bit register
 void VL53L0X::writeReg(uint8_t reg, uint8_t value)
 {
-  Wire.beginTransmission(address);
-  Wire.write(reg);
-  Wire.write(value);
-  last_status = Wire.endTransmission();
+  i2cdev.writeByte(address, reg, value);
+  // last_status = Wire.endTransmission();
 }
 
 // Write a 16-bit register
 void VL53L0X::writeReg16Bit(uint8_t reg, uint16_t value)
 {
-  Wire.beginTransmission(address);
-  Wire.write(reg);
-  Wire.write((value >> 8) & 0xFF); // value high byte
-  Wire.write( value       & 0xFF); // value low byte
-  last_status = Wire.endTransmission();
+  i2cdev.writeWord(address, reg, value);
+  // last_status = Wire.endTransmission();
 }
 
 // Write a 32-bit register
 void VL53L0X::writeReg32Bit(uint8_t reg, uint32_t value)
 {
-  Wire.beginTransmission(address);
-  Wire.write(reg);
-  Wire.write((value >> 24) & 0xFF); // value highest byte
-  Wire.write((value >> 16) & 0xFF);
-  Wire.write((value >>  8) & 0xFF);
-  Wire.write( value        & 0xFF); // value lowest byte
-  last_status = Wire.endTransmission();
+  uint8_t data[4] = {
+      ((value >> 24) & 0xFF),
+      ((value >> 16) & 0xFF),
+      ((value >> 8) & 0xFF),
+      (value & 0xFF)};
+  i2cdev.writeBytes(address, reg, 4, data);
 }
 
 // Read an 8-bit register
 uint8_t VL53L0X::readReg(uint8_t reg)
 {
   uint8_t value;
-
-  Wire.beginTransmission(address);
-  Wire.write(reg);
-  last_status = Wire.endTransmission();
-
-  Wire.requestFrom(address, (uint8_t)1);
-  value = Wire.read();
-
+  i2cdev.readByte(address, reg, &value);
   return value;
 }
 
@@ -328,33 +316,20 @@ uint8_t VL53L0X::readReg(uint8_t reg)
 uint16_t VL53L0X::readReg16Bit(uint8_t reg)
 {
   uint16_t value;
-
-  Wire.beginTransmission(address);
-  Wire.write(reg);
-  last_status = Wire.endTransmission();
-
-  Wire.requestFrom(address, (uint8_t)2);
-  value  = (uint16_t)Wire.read() << 8; // value high byte
-  value |=           Wire.read();      // value low byte
-
+  i2cdev.readWord(address, reg, &value);
   return value;
 }
 
 // Read a 32-bit register
 uint32_t VL53L0X::readReg32Bit(uint8_t reg)
 {
-  uint32_t value;
+  uint8_t data[4];
+  i2cdev.readBytes(address, reg, 4, data);
 
-  Wire.beginTransmission(address);
-  Wire.write(reg);
-  last_status = Wire.endTransmission();
-
-  Wire.requestFrom(address, (uint8_t)4);
-  value  = (uint32_t)Wire.read() << 24; // value highest byte
-  value |= (uint32_t)Wire.read() << 16;
-  value |= (uint16_t)Wire.read() <<  8;
-  value |=           Wire.read();       // value lowest byte
-
+  uint32_t value = (uint32_t)data[0] << 24
+    | (uint32_t)data[1] << 16
+    | (uint32_t)data[2] << 8
+    | (uint32_t)data[2];
   return value;
 }
 
@@ -362,31 +337,15 @@ uint32_t VL53L0X::readReg32Bit(uint8_t reg)
 // starting at the given register
 void VL53L0X::writeMulti(uint8_t reg, uint8_t const * src, uint8_t count)
 {
-  Wire.beginTransmission(address);
-  Wire.write(reg);
-
-  while (count-- > 0)
-  {
-    Wire.write(*(src++));
-  }
-
-  last_status = Wire.endTransmission();
+  i2cdev.writeBytes(address, reg, count, src);
+  // last_status = Wire.endTransmission();
 }
 
 // Read an arbitrary number of bytes from the sensor, starting at the given
 // register, into the given array
 void VL53L0X::readMulti(uint8_t reg, uint8_t * dst, uint8_t count)
 {
-  Wire.beginTransmission(address);
-  Wire.write(reg);
-  last_status = Wire.endTransmission();
-
-  Wire.requestFrom(address, count);
-
-  while (count-- > 0)
-  {
-    *(dst++) = Wire.read();
-  }
+  i2cdev.readBytes(address, reg, count, dst);
 }
 
 // Set the return signal rate limit check value in units of MCPS (mega counts

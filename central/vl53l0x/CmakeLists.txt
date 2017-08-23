@@ -1,0 +1,35 @@
+cmake_minimum_required(VERSION 2.8)
+set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-c++)
+project (VL53)
+
+add_definitions("-Wall -std=c++14")
+
+set(SRC ${CMAKE_SOURCE_DIR}/../src)
+set(THIRDPARTY ${CMAKE_SOURCE_DIR}/../../thirdparty)
+
+include_directories(
+  ${THIRDPARTY}/mraa/include
+)
+include_directories(
+  ${SRC}
+  ${SRC}/api/i2c
+  ${SRC}/api/i2c/I2Cdev
+  ${SRC}/api/i2c/vl53l0x
+  ${SRC}/common
+)
+
+link_directories(
+  ${THIRDPARTY}/libs/mraa/arm
+)
+
+add_executable(VL53
+  ${SRC}/api/i2c/vl53l0x/VL53L0X.cpp
+  ${SRC}/api/i2c/I2Cdev/I2Cdev.cpp
+  ${SRC}/common/Timer.cpp
+  main.cpp
+)
+
+target_link_libraries(VL53
+  mraa
+  pthread
+)
