@@ -16,6 +16,7 @@ include_directories(
   ${SRC}/api/i2c/I2Cdev
   ${SRC}/api/i2c/vl53l0x
   ${SRC}/common
+  ${SRC}/model/sensor/range
 )
 
 link_directories(
@@ -26,6 +27,8 @@ add_executable(VL53
   ${SRC}/api/i2c/vl53l0x/VL53L0X.cpp
   ${SRC}/api/i2c/I2Cdev/I2Cdev.cpp
   ${SRC}/common/Timer.cpp
+  ${SRC}/model/sensor/range/RangeSensor.cpp
+  ${SRC}/model/sensor/range/RangeSensorArray.cpp
   main.cpp
 )
 

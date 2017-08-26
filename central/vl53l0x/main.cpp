@@ -1,21 +1,20 @@
 #include "mraa.hpp"
 #include "I2Cdev.h"
-#include "VL53L0X.h"
-#include "Timer.h"
+#include "RangeSensor.h"
+#include "RangeSensorArray.h"
 #include <cstdint>
 #include <iostream>
 
 int main() {
     mraa::I2c i2c(1, true);
+    i2c.frequency(mraa::I2cMode::I2C_HIGH);
     I2Cdev i2cdev(i2c);
-    VL53L0X vl53l0x(i2cdev);
-    vl53l0x.init();
-    vl53l0x.setTimeout(500);
-
+    auto sa = RangeSensorArray::instantiate(i2cdev);
     while (true) {
-        std::cout << vl53l0x.readRangeSingleMillimeters() << std::endl;
-        if (vl53l0x.timeoutOccurred()) {
-            std::cout << "timed out" << std::endl;
+        auto ranges = sa->readRanges();
+        for (auto &r : ranges) {
+            std::cout << r << ", ";
         }
+        std::cout << std::endl;
     }
 }
