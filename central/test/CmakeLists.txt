@@ -50,6 +50,7 @@ include_directories(
   ${SRC}/model/sensor/motion
   ${SRC}/model/sensor/motion/filter
   ${SRC}/model/sensor/motion/mpu6050
+  ${SRC}/model/sensor/range
   ${SRC}/model/walk
   ${SRC}/model/walk/lip
   ${SRC}/model/walk/stabilizer
@@ -64,6 +65,7 @@ link_directories(
 
 add_executable(Test
   ${SRC}/common/utility.cpp
+  ${SRC}/common/Timer.cpp
   ${SRC}/conf/conf.cpp
   ${SRC}/controller/walk/WalkController.cpp
   ${SRC}/controller/motion/MotionController.cpp
@@ -80,6 +82,8 @@ add_executable(Test
   ${SRC}/model/walk/lip/LinearInvertedPendulum.cpp
   ${SRC}/model/walk/stabilizer/CPStabilizer.cpp
   ${SRC}/model/walk/swing/SwingLegTrajectory.cpp
+  ${SRC}/model/sensor/range/ActiveRangeSensorArray.cpp
+  ActiveRangeSensorArrayTest.cpp
   ConfTest.cpp
   CommandParserTest.cpp
   CPStabilizerTest.cpp
