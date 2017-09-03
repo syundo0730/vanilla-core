@@ -1,6 +1,8 @@
 #include "StdIOCommandParser.h"
 #include <stdexcept>
 #include <string>
+#include <regex>
+#include <cstdint>
 
 class StdIOCommandParserImpl : public StdIOCommandParser
 {
@@ -12,19 +14,48 @@ class StdIOCommandParserImpl : public StdIOCommandParser
         std::string command_str;
         stream >> command_str;
         Command command;
-        if (command_str == "a")
+        if (std::regex_match(command_str, std::regex("stop_motion")))
         {
-            return createCommand(CommandType::MotionStart, 0);
+            command = createCommand(CommandType::MotionStop);
         }
-        else if (command_str == "b")
+        else if (parseMotionCommand(command_str, command))
         {
-            return createCommand(CommandType::MotionStart, 1);
         }
-        else if (command_str == "c")
+        else if (std::regex_match(command_str, std::regex("show_joint_angles")))
         {
-            return createCommand(CommandType::MotionStop);
+            command = createCommand(CommandType::ShowJointAngles);
         }
-        return Command();
+        else if (parseSetJointAngleCommand(command_str, command))
+        {
+        }
+        return command;
+    }
+
+  private:
+    bool parseMotionCommand(std::string command_str, Command& command)
+    {
+        std::regex r("start_motion:(\\d+)");
+        std::smatch m;
+        bool matched = std::regex_search(command_str, m, r);
+        if (!matched) {
+            return false;
+        }
+        uint16_t id = std::stoi(m[1]);
+        command = createCommand(CommandType::MotionStart, id);
+        return true;
+    }
+    bool parseSetJointAngleCommand(std::string command_str, Command& command)
+    {
+        std::regex r("set_joint_angle:(\\d+),(-?\\d+)");
+        std::smatch m;
+        bool matched = std::regex_search(command_str, m, r);
+        if (!matched) {
+            return false;
+        }
+        uint16_t id = std::stoi(m[1]);
+        uint16_t pos = std::stoi(m[2]);
+        command = createCommand(CommandType::SetJointAngle, id, pos);
+        return true;
     }
 };
 

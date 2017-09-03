@@ -15,18 +15,29 @@ TEST_F(StdIOCommandParserTest, parse)
   auto stdIOParser = StdIOCommandParser::instantiate();
   std::stringstream ss;
 
-  ss << "a" << std::endl;
-  auto cmd0 = stdIOParser->parse(ss);
-  EXPECT_EQ(CommandType::MotionStart, cmd0.commandType);
-  EXPECT_EQ(0, cmd0.payload[0]);
+  ss << "stop_motion" << std::endl;
+  auto cmd = stdIOParser->parse(ss);
+  EXPECT_EQ(CommandType::MotionStop, cmd.commandType);
 
-  ss << "b" << std::endl;
-  auto cmd1 = stdIOParser->parse(ss);
-  EXPECT_EQ(CommandType::MotionStart, cmd1.commandType);
-  EXPECT_EQ(0, cmd0.payload[0]);
+  ss << "start_motion:1" << std::endl;
+  cmd = stdIOParser->parse(ss);
+  EXPECT_EQ(CommandType::MotionStart, cmd.commandType);
+  EXPECT_EQ(1, cmd.payload[0]);
 
-  ss << "c" << std::endl;
-  auto cmd2 = stdIOParser->parse(ss);
-  EXPECT_EQ(CommandType::MotionStop, cmd2.commandType);
+  ss << "show_joint_angles" << std::endl;
+  cmd = stdIOParser->parse(ss);
+  EXPECT_EQ(CommandType::ShowJointAngles, cmd.commandType);
+
+  ss << "set_joint_angle:1,3142" << std::endl;
+  cmd = stdIOParser->parse(ss);
+  EXPECT_EQ(CommandType::SetJointAngle, cmd.commandType);
+  EXPECT_EQ(1, cmd.payload[0]);
+  EXPECT_EQ(3142, (int16_t)cmd.payload[1]);
+
+  ss << "set_joint_angle:1,-3142" << std::endl;
+  cmd = stdIOParser->parse(ss);
+  EXPECT_EQ(CommandType::SetJointAngle, cmd.commandType);
+  EXPECT_EQ(1, cmd.payload[0]);
+  EXPECT_EQ(-3142, (int16_t)cmd.payload[1]);
 }
 }

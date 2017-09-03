@@ -14,6 +14,8 @@ enum class CommandType
 	WalkStop,
 	MotionStart,
 	MotionStop,
+	SetJointAngle,
+	ShowJointAngles,
 };
 
 struct Command

@@ -33,6 +33,9 @@ class CommandParserImpl : public CommandParser
         case 0x02:
             commandType = CommandType::WalkStart;
             break;
+        case 0x05:
+            commandType = CommandType::SetJointAngle;
+            break;
         }
         int bodyLen = data[3];
         std::map<int, uint16_t> payload;
