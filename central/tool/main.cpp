@@ -11,7 +11,7 @@ int main() {
     auto rsApi = RSApi::instantiate(serialApi);
 
     std::cout << "this program will overwite all ids which is connectted to serial line" << std::endl;
-    uint8_t id;
+    int id;
     std::cout << "input target id" << std::endl;
     std::cin >> id;
 
