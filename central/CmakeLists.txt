@@ -22,6 +22,7 @@ include_directories(
   src/api/i2c/mpu
   src/api/i2c/mpu/mpu6050
   src/api/i2c/pwmdriver
+  src/api/i2c/vl53l0x
   src/api/serial
   src/api/serial/servo
   src/api/serial/servo/futaba
@@ -42,6 +43,7 @@ include_directories(
   src/model/sensor/motion
   src/model/sensor/motion/filter
   src/model/sensor/motion/mpu6050
+  src/model/sensor/range
   src/model/walk
   src/model/walk/lip
   src/model/walk/stabilizer
@@ -63,10 +65,12 @@ add_executable(Main
   src/api/serial/servo/futaba/RSApi.cpp
   src/api/websocket/rosbridge/ROSBridgeApi.cpp
   src/api/websocket/WebsocketApi.cpp
+  src/api/i2c/vl53l0x/VL53L0X.cpp
   src/common/Ticker.cpp
   src/common/Timer.cpp
   src/common/utility.cpp
   src/conf/conf.cpp
+  src/controller/AutoController.cpp
   src/controller/CommandBus.cpp
   src/controller/CommandParser.cpp
   src/controller/MainController.cpp
@@ -86,6 +90,9 @@ add_executable(Main
   src/model/sensor/motion/filter/MadgwickQuaternionFilter.cpp
   src/model/sensor/motion/MotionSensor.cpp
   src/model/sensor/motion/mpu6050/MPU6050_DMP.cpp
+  src/model/sensor/range/ActiveRangeSensorArray.cpp
+  src/model/sensor/range/RangeSensor.cpp
+  src/model/sensor/range/RangeSensorArray.cpp
   src/model/walk/lip/LinearInvertedPendulum.cpp
   src/model/walk/stabilizer/CPStabilizer.cpp
   src/model/walk/swing/SwingLegTrajectory.cpp

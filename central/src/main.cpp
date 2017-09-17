@@ -14,7 +14,7 @@ int main()
 
 	// command watch thread
 	auto stdIORouter = dependency->getStdIORouter();
-	std::thread th([&] {
+	std::thread commandThread([&] {
 		std::cout << "waiting command" << std::endl;
 		while (true)
 		{
@@ -24,6 +24,22 @@ int main()
 	});
 
 	auto controller = dependency->getMainController();
+	// main control thread
+	std::thread mainControlThread([&] {
+		std::cout << "main control thread started" << std::endl;
+		// control loop
+		Ticker ticker(10, std::bind(&MainController::update, controller));
+		ticker.start();
+	});
+
+	auto autoController = dependency->getAutoController();
+	// auto control thread
+	std::thread autoControlThread([&] {
+		std::cout << "auto control thread started" << std::endl;
+		// control loop
+		Ticker ticker(20, std::bind(&AutoController::update, autoController));
+		ticker.start();
+	});
 
 	// // bluetooth command watch thread
 	// auto bluetooth = std::make_unique<SerialApi>("hoge", 115200);
@@ -33,9 +49,7 @@ int main()
 	// 	std::placeholders::_1,
 	// 	std::placeholders::_2));
 
-	// control loop
-	Ticker ticker(1000, std::bind(&MainController::update, controller));
-	ticker.start();
-
-	th.join();
+	commandThread.join();
+	mainControlThread.join();
+	autoControlThread.join();
 }

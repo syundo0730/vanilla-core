@@ -15,7 +15,7 @@ class ActiveRangeSensorArrayImpl : public ActiveRangeSensorArray
     int currentStep;
     int16_t currentAngle;
     std::vector<uint16_t> ranges;
-    Listener* listener;
+    Listener *listener;
 
     static const int16_t RANGE_UPPER = 450;
     static const int16_t RANGE_LOWER = -450;
@@ -41,7 +41,8 @@ class ActiveRangeSensorArrayImpl : public ActiveRangeSensorArray
     {
     }
 
-    void moveToInitialPosition() {
+    void moveToInitialPosition() override
+    {
         auto targetAngle = -RANGE_UPPER;
         setTargetJointAngle(targetAngle);
         currentStep = 0;
@@ -49,41 +50,48 @@ class ActiveRangeSensorArrayImpl : public ActiveRangeSensorArray
         initialized = true;
     }
 
-    void update() {
-        if (!initialized) {
+    void update() override
+    {
+        if (!initialized)
+        {
             return;
         }
         auto ranges = rangeSensorArray.readRanges();
         assignRanges(ranges);
         moveJoint();
         ++currentStep;
-        if (currentStep == SCAN_NUM) {
+        if (currentStep == SCAN_NUM)
+        {
             onScanEnded();
         }
     }
 
-    void setListener(Listener *l) {
+    void setListener(Listener *l) override
+    {
         listener = l;
     }
 
   private:
-    void setTargetJointAngle(int16_t angle) {
+    void setTargetJointAngle(int16_t angle)
+    {
         jointRepository.setTargetJointAngle(jointID, JointAngle(angle));
     }
 
-    void onScanEnded() {
+    void onScanEnded()
+    {
         (*listener)(ranges);
         moveClockwise = !moveClockwise;
         currentStep = 0;
     }
 
-    void assignRanges(const std::vector<uint16_t> & src) {
+    void assignRanges(const std::vector<uint16_t> &src)
+    {
         int i = 0;
-        for (auto &r : src) {
-            int index = moveClockwise ?
-            i * SCAN_NUM + currentStep :
-            (i + 1) * SCAN_NUM - currentStep;
-            if (index == RANGE_NUM) {
+        for (auto &r : src)
+        {
+            int index = moveClockwise ? i * SCAN_NUM + currentStep : (i + 1) * SCAN_NUM - currentStep;
+            if (index == RANGE_NUM)
+            {
                 index = 0;
             }
             ranges[index] = r;
@@ -91,7 +99,8 @@ class ActiveRangeSensorArrayImpl : public ActiveRangeSensorArray
         }
     }
 
-    void moveJoint() {
+    void moveJoint()
+    {
         int diff = moveClockwise ? RANGE_DIFF : -RANGE_DIFF;
         currentAngle += diff;
         setTargetJointAngle(currentAngle);
@@ -99,13 +108,12 @@ class ActiveRangeSensorArrayImpl : public ActiveRangeSensorArray
 };
 
 std::unique_ptr<ActiveRangeSensorArray> ActiveRangeSensorArray::instantiate(
-        RangeSensorArray &rangeSensorArray,
-        JointRepository &jointRepository,
-        int jointID)
+    RangeSensorArray &rangeSensorArray,
+    JointRepository &jointRepository,
+    int jointID)
 {
     return std::make_unique<ActiveRangeSensorArrayImpl>(
         rangeSensorArray,
         jointRepository,
-        jointID
-    );
+        jointID);
 }

@@ -24,6 +24,9 @@
 #include "StdIOCommandParser.h"
 #include "StdIORouter.h"
 #include "conf.h"
+#include "RangeSensor.h"
+#include "RangeSensorArray.h"
+#include "ActiveRangeSensorArray.h"
 
 class DependencyImpl : public Dependency
 {
@@ -56,6 +59,10 @@ class DependencyImpl : public Dependency
 
 	std::unique_ptr<StdIOCommandParser> stdIOCommandParser;
 	std::unique_ptr<StdIORouter> stdIORouter;
+
+	std::unique_ptr<RangeSensorArray> rangeSensorArray;
+	std::unique_ptr<ActiveRangeSensorArray> activeRangeSensorArray;
+	std::unique_ptr<AutoController> autoController;
 
   public:
 	DependencyImpl()
@@ -92,7 +99,10 @@ class DependencyImpl : public Dependency
 		  mainController(MainController::instantiate(
 			  *jointRepository, *walkController, *motionController, *motionSensor, *commandBus, *commandParser)),
 		  stdIOCommandParser(StdIOCommandParser::instantiate()),
-		  stdIORouter(StdIORouter::instantiate(*commandBus, *stdIOCommandParser))
+		  stdIORouter(StdIORouter::instantiate(*commandBus, *stdIOCommandParser)),
+		  rangeSensorArray(RangeSensorArray::instantiate(*i2cdev)),
+		  activeRangeSensorArray(ActiveRangeSensorArray::instantiate(*rangeSensorArray, *jointRepository, 21)),
+		  autoController(AutoController::instantiate(*activeRangeSensorArray, *commandBus))
 	{
 	}
 
@@ -104,6 +114,10 @@ class DependencyImpl : public Dependency
 	StdIORouter *getStdIORouter() override
 	{
 		return stdIORouter.get();
+	}
+
+	AutoController *getAutoController() override {
+		return autoController.get();
 	}
 };
 
