@@ -53,11 +53,14 @@ class MotionServiceImpl : public MotionService
     void _setInitialPose() {
         auto settingMap = conf.Joint.SettingMap;
         initialPose.resize(settingMap.size());
+        std::cout << "setInitialPose: ";
         for (const auto &kv : settingMap) {
             auto jointID = kv.first;
             auto current = jointRepository.getCurrentJointAngle(jointID).getAsDeciDegree();
             initialPose[jointID] = current;
+            std::cout << current << ", ";
         }
+        std::cout << std::endl;
     }
     void _reset() {
         isPlaying = false;
@@ -74,10 +77,10 @@ class MotionServiceImpl : public MotionService
             stop();
             return;
         }
-        auto current = playingPoseIndex == 0 ? initialPose : poses.at(playingPoseIndex - 1).JointAnglesDeciDegree;
-        auto target = poses.at(playingPoseIndex).JointAnglesDeciDegree;
+        auto start = playingPoseIndex == 0 ? initialPose : poses.at(playingPoseIndex - 1).JointAnglesDeciDegree;
+        auto end = poses.at(playingPoseIndex).JointAnglesDeciDegree;
         auto interval = poses.at(playingPoseIndex).Interval;
-        setTargetWithInterpolation(current, target, interval);
+        setTargetWithInterpolation(start, end, interval);
 
         if (playingStep == interval - 1) {
             playingStep = 0;
@@ -87,18 +90,21 @@ class MotionServiceImpl : public MotionService
         }
     }
     void setTargetWithInterpolation(
-        const std::vector<int16_t> &current,
-        const std::vector<int16_t> &target,
+        const std::vector<int16_t> &start,
+        const std::vector<int16_t> &end,
         int interval) {
-        auto angleLength = target.size();
+        auto angleLength = end.size();
         auto rate = (double)(playingStep + 1) / (double)interval;
-        std::cout << "next: ";
         for (auto i = 0; i < angleLength; ++i) {
-            auto c = current[i];
-            auto t = target[i];
-            int16_t next = c + (t - c) * rate;
-            jointRepository.setTargetJointAngle(i, JointAngle(next));
-            std::cout << next << " : " << c << " : " << t << " : " << rate << ", ";
+            auto s = start[i];
+            auto e = end[i];
+            int16_t target = s + (e - s) * rate;
+            jointRepository.setTargetJointAngle(i, JointAngle(target));
+            // std::cout << "id: " << i << " * "
+            // << "s: " << s << " * "
+            // << "e: " << e << " * "
+            // << "t: " << target << " * "
+            // << "rate: " << rate << " | ";
         }
         std::cout << std::endl;
     }

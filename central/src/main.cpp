@@ -14,34 +14,28 @@ int main()
 
 	// command watch thread
 	auto stdIORouter = dependency->getStdIORouter();
-	try {
-		std::thread th([&]{
-			std::cout << "waiting command" << std::endl;
-			while(true) {
-				std::cout << "Enter command:" << std::endl;
-				stdIORouter->route();
-			}
-		});
-		th.join();
-	} catch (std::exception &ex) {
-		std::cerr << ex.what() << std::endl;
-	}
+	std::thread th([&] {
+		std::cout << "waiting command" << std::endl;
+		while (true)
+		{
+			std::cout << "Enter command:" << std::endl;
+			stdIORouter->route();
+		}
+	});
 
 	auto controller = dependency->getMainController();
 
-	// bluetooth command watch thread
-	auto bluetooth = std::make_unique<SerialApi>("hoge", 115200);
-	// SerialApi::Listener listener = [](const uint8_t* data, std::size_t size) {
-	// 	controller->route(data, size);
-	// };
-	// bluetooth->setListener(listener);
-	bluetooth->setListener(std::bind(
-		&MainController::route,
-		controller,
-		std::placeholders::_1,
-		std::placeholders::_2));
+	// // bluetooth command watch thread
+	// auto bluetooth = std::make_unique<SerialApi>("hoge", 115200);
+	// bluetooth->setListener(std::bind(
+	// 	&MainController::route,
+	// 	controller,
+	// 	std::placeholders::_1,
+	// 	std::placeholders::_2));
 
 	// control loop
-	Ticker ticker(10, std::bind(&MainController::update, controller));
+	Ticker ticker(1000, std::bind(&MainController::update, controller));
 	ticker.start();
+
+	th.join();
 }

@@ -6,6 +6,7 @@
 #include "conf.h"
 #include "PWMMotor.h"
 #include <map>
+#include <iostream>
 
 class JointRepositoryImpl : public JointRepository
 {
@@ -34,10 +35,12 @@ class JointRepositoryImpl : public JointRepository
 
 	void setCurrentJointAngle(int id, JointAngle angle) override
 	{
+		std::cout << "setCurrentJointAngle: " << id << " " << angle.getAsDeciDegree() << std::endl;
 		jointMap[id].setCurrentAngle(angle);
 	}
 	void setTargetJointAngle(int id, JointAngle angle) override
 	{
+		std::cout << "setTargetJointAngle: " << id << " " << angle.getAsDeciDegree() << std::endl;
 		jointMap[id].setTargetAngle(angle);
 		// TODO: current angle is asumed to be same as target angle for now
 		// we should implement real angle feedback
@@ -55,12 +58,15 @@ class JointRepositoryImpl : public JointRepository
 	{
 		std::vector<uint8_t> rsIDs;
 		std::vector<uint16_t> rsPositions;
+		std::cout << "apply: ";
 		for (const auto &kv : settingMap)
 		{
 			auto jointID = kv.first;
 			auto s = kv.second;
 			auto realID = s.RealID;
-			auto a = jointMap[jointID].getTargetAngle().getAsDeciDegree() + s.Offset;
+			auto target = jointMap[jointID].getTargetAngle().getAsDeciDegree();
+			auto a = target + s.Offset;
+			std::cout << target << ", " << std::endl;
 			if (s.MotorType == motor_type::RS) {
 				rsIDs.push_back(realID);
 				rsPositions.push_back(a);
@@ -68,6 +74,7 @@ class JointRepositoryImpl : public JointRepository
 				pwmapi.setDuty(realID, PWMMotor::deciDegreeToDuty(s.MotorType, a));
 			}
 		}
+		std::cout << std::endl;
 		rsapi.sendMultiPosition(rsIDs, rsPositions);
 	}
 

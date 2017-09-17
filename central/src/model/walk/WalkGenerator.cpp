@@ -115,6 +115,10 @@ class WalkGeneratorImpl : public WalkGenerator
 	{
 		return currentGait;
 	}
+	bool needsUpdate() override
+	{
+		return isWalking;
+	}
 
   private:
   	void updateState() {

@@ -24,6 +24,7 @@ class WalkGenerator
 	virtual void stop() = 0;
 	virtual WalkState getState() = 0;
 	virtual Gait getGait() = 0;
+	virtual bool needsUpdate() = 0;
 };
 
 #endif // WALK_GENERATOR_H

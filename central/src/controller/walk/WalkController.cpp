@@ -26,6 +26,9 @@ class WalkControllerImpl : public WalkController
 	}
 	void update() override
 	{
+		if (!walkGenerator.needsUpdate()) {
+			return;
+		}
 		walkGenerator.update();
 		auto state = walkGenerator.getState();
 		legControlService.setEndEffectorPosition(

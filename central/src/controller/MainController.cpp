@@ -41,18 +41,19 @@ class MainControllerImpl : public MainController
 		motionController.update();
 		joint_repository.applyTargetAngle();
 
-		// // get motion state
-		// auto q = motion_sensor.getQuaternion();
-		// auto pos = Vector3(1, 0, 0);
-		// auto newPos = q * pos;
-		// // std::cout << newPos[0] << std::endl;
-		// // auto ea = q.toRotationMatrix().eulerAngles(0, 1, 2);
+		// get motion state
+		auto q = motion_sensor.getQuaternion();
+		auto pos = Vector3(1, 0, 0);
+		auto newPos = q * pos;
+		// std::cout << newPos[0] << std::endl;
+		// auto ea = q.toRotationMatrix().eulerAngles(0, 1, 2);
 		// std::cout << newPos(0) << "\t";		 //roll
 		// std::cout << newPos(1) << "\t";		 //pitch
 		// std::cout << newPos(2) << std::endl; //yaw
 	}
 	void route(const uint8_t *data, std::size_t length) override
 	{
+		std::cout << data << std::endl;
 		Command cmd;
 		try {
 			cmd = commandParser.parse(data, length);
