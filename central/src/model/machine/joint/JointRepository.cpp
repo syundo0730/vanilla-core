@@ -42,9 +42,6 @@ class JointRepositoryImpl : public JointRepository
 	{
 		std::cout << "setTargetJointAngle: " << id << " " << angle.getAsDeciDegree() << std::endl;
 		jointMap[id].setTargetAngle(angle);
-		// TODO: current angle is asumed to be same as target angle for now
-		// we should implement real angle feedback
-		setCurrentJointAngle(id, angle);
 	}
 	JointAngle getCurrentJointAngle(int id) override
 	{
@@ -56,6 +53,9 @@ class JointRepositoryImpl : public JointRepository
 	}
 	void applyTargetAngle() override
 	{
+		if (!needsApplication()) {
+			return;
+		}
 		std::vector<uint8_t> rsIDs;
 		std::vector<uint16_t> rsPositions;
 		std::cout << "apply: ";
@@ -73,9 +73,14 @@ class JointRepositoryImpl : public JointRepository
 			} else {
 				pwmapi.setDuty(realID, PWMMotor::deciDegreeToDuty(s.MotorType, a));
 			}
+
+			// TODO: current angle is asumed to be same as target angle for now
+			// we should implement real angle feedback
+			setCurrentJointAngle(jointID, target);
 		}
 		std::cout << std::endl;
 		rsapi.sendMultiPosition(rsIDs, rsPositions);
+		start_motion:0
 	}
 
   private:
@@ -88,6 +93,18 @@ class JointRepositoryImpl : public JointRepository
 			setTargetJointAngle(id, angle);
 			setCurrentJointAngle(id, angle);
 		}
+	}
+	bool needsApplication() {
+		for (const auto &kv : settingMap)
+		{
+			auto id = kv.first;
+			auto current = getCurrentJointAngle(id).getAsDeciDegree();
+			auto target = getTargetJointAngle(id).getAsDeciDegree();
+			if (current != target) {
+				return true;
+			}
+		}
+		return false;
 	}
 };
 
