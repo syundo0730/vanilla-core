@@ -15,6 +15,7 @@ class MockWalkGenerator : public WalkGenerator
     MOCK_METHOD0(stop, void(void));
     MOCK_METHOD0(getState, WalkState(void));
     MOCK_METHOD0(getGait, Gait(void));
+    MOCK_METHOD0(needsUpdate, bool(void));
 };
 
 #endif

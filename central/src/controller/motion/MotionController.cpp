@@ -33,6 +33,18 @@ class MotionControllerImpl : public MotionController
 			motionService.start(motionID);
 		} else if (command.commandType == CommandType::MotionStop) {
 			motionService.stop();
+		} else if (command.commandType == CommandType::SetJointAngle) {
+			int id = command.payload[0];
+			int16_t angle = command.payload[1];
+			motionService.setTargetJointAngle(id, angle);
+		} else if (command.commandType == CommandType::ShowJointAngles) {
+			auto angles = motionService.getCurrentJointAngles();
+        for (const auto &kv : angles) {
+					auto id = kv.first;
+					auto value = kv.second;
+					std::cout << "id: " << id << " value: " << value << ", ";
+				}
+				std::cout << std::endl;
 		}
 	}
 };
