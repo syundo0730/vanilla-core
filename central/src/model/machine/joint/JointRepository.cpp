@@ -15,6 +15,7 @@ class JointRepositoryImpl : public JointRepository
 	RSApi &rsapi;
 	Adafruit_PWMServoDriver &pwmapi;
 	std::map<int, JointSetting> &settingMap;
+	bool initialized;
 
   public:
 	JointRepositoryImpl(
@@ -23,7 +24,8 @@ class JointRepositoryImpl : public JointRepository
 		Conf &conf)
 		: rsapi(rsapi),
 		  pwmapi(pwmapi),
-		  settingMap(conf.Joint.SettingMap)
+		  settingMap(conf.Joint.SettingMap),
+		  initialized(false)
 	{
 		resetTargetJointAngles();
 		// power on rs servo motors
@@ -89,6 +91,10 @@ class JointRepositoryImpl : public JointRepository
 		}
 	}
 	bool needsApplication() {
+		if (!initialized) {
+			initialized = true;
+			return true;
+		}
 		for (const auto &kv : settingMap)
 		{
 			auto id = kv.first;
