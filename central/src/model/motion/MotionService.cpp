@@ -41,6 +41,7 @@ class MotionServiceImpl : public MotionService
     }
     void start(int motionID) override
     {
+        _reset();
         playingMotionID = motionID;
         isPlaying = true;
     }
