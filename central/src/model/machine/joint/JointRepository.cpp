@@ -28,11 +28,6 @@ class JointRepositoryImpl : public JointRepository
 		  initialized(false)
 	{
 		resetTargetJointAngles();
-		// power on rs servo motors
-		rsapi.on();
-		// start pwm
-		pwmapi.begin();
-		pwmapi.setPrescale(64); //This value is decided for 10ms interval.
 	}
 
 	void setCurrentJointAngle(int id, JointAngle angle) override
@@ -53,8 +48,14 @@ class JointRepositoryImpl : public JointRepository
 	}
 	void applyTargetAngle(bool forceApply) override
 	{
-		if (!forceApply && !needsApplication()) {
-			return;
+		if (forceApply) {
+		} else {
+			if (!initialized) {
+				return;
+			}
+			if (!needsApplication()) {
+				return;
+			}
 		}
 		std::vector<uint8_t> rsIDs;
 		std::vector<uint16_t> rsPositions;
@@ -78,10 +79,25 @@ class JointRepositoryImpl : public JointRepository
 		}
 		rsapi.sendMultiPosition(rsIDs, rsPositions);
 	}
-	void moveToInitialPose() override
+	void enable() override
 	{
 		resetTargetJointAngles();
+
+		// power on rs servo motors
+		rsapi.on();
+		// start pwm
+		pwmapi.begin();
+		pwmapi.setPrescale(64); //This value is decided for 10ms interval.
+
 		applyTargetAngle(true);
+		initialized = true;
+	}
+	void free() override
+	{
+		// power off rs servo motors
+		rsapi.off();
+		// start pwm
+		pwmapi.off();
 	}
 
   private:
@@ -96,10 +112,6 @@ class JointRepositoryImpl : public JointRepository
 		}
 	}
 	bool needsApplication() {
-		if (!initialized) {
-			initialized = true;
-			return true;
-		}
 		for (const auto &kv : settingMap)
 		{
 			auto id = kv.first;

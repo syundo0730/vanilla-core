@@ -55,6 +55,7 @@ public:
   virtual void setPWMFreq(float freq) = 0;
   virtual void setPrescale(uint8_t prescale) = 0;
   virtual void setDuty(uint8_t channel, uint16_t duty) = 0;
+  virtual void off() = 0;
 };
 
 #endif

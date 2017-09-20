@@ -82,6 +82,12 @@ class Adafruit_PWMServoDriverImpl : public Adafruit_PWMServoDriver
         duty = 4094 * duty / pulselength;
         setPWM(num, 0, duty);
     }
+    void off() override
+    {
+        for (uint8_t i = 0; i < 16; ++i) {
+            setDuty(i, 0);
+        }
+    }
 
   private:
     void setPWM(uint8_t channel, uint16_t on, uint16_t off)

@@ -81,7 +81,17 @@ class MainControllerImpl : public MainController
 			std::cout << "config file reloaded" << std::endl;
 			conf.reload();
 			std::cout << "move to initial pose" << std::endl;
-			joint_repository.moveToInitialPose();
+			joint_repository.enable();
+		}
+		else if (command.commandType == CommandType::Enable)
+		{
+			std::cout << "power on" << std::endl;
+			joint_repository.enable();
+		}
+		else if (command.commandType == CommandType::Free)
+		{
+			std::cout << "power off" << std::endl;
+			joint_repository.free();
 		}
 	}
 };

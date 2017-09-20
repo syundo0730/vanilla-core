@@ -13,5 +13,6 @@ class MockAdafruit_PWMServoDriver : public Adafruit_PWMServoDriver
     MOCK_METHOD1(setPWMFreq, void(float));
     MOCK_METHOD1(setPrescale, void(uint8_t));
     MOCK_METHOD2(setDuty, void(uint8_t, uint16_t));
+    MOCK_METHOD0(off, void(void));
 };
 #endif

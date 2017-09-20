@@ -20,7 +20,8 @@ class JointRepository
 	virtual JointAngle getCurrentJointAngle(int id) = 0;
 	virtual JointAngle getTargetJointAngle(int id) = 0;
 	virtual void applyTargetAngle(bool forceApply = false) = 0;
-	virtual void moveToInitialPose() = 0;
+	virtual void enable() = 0;
+	virtual void free() = 0;
 };
 
 #endif

@@ -32,6 +32,14 @@ class StdIOCommandParserImpl : public StdIOCommandParser
         {
             command = createCommand(CommandType::LoadConfig);
         }
+        else if (std::regex_match(command_str, std::regex("enable")))
+        {
+            command = createCommand(CommandType::Enable);
+        }
+        else if (std::regex_match(command_str, std::regex("free")))
+        {
+            command = createCommand(CommandType::Free);
+        }
         return command;
     }
 

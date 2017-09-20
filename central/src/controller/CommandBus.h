@@ -17,6 +17,8 @@ enum class CommandType
 	SetJointAngle,
 	ShowJointAngles,
 	LoadConfig,
+	Enable,
+	Free,
 };
 
 struct Command
