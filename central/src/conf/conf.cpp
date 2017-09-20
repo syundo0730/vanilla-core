@@ -7,13 +7,19 @@
 #include "conv_walk_conf.h"
 #include <iostream>
 
-Conf::Conf(std::string configFilePath) : Conf(load(configFilePath))
+Conf::Conf(std::string _configFilePath)
+	: Conf(load(_configFilePath))
 {
+	configFilePath = _configFilePath;
 }
 
 Conf Conf::load(std::string configFilePath)
 {
 	return YAML::LoadFile(configFilePath).as<Conf>();
+}
+
+void Conf::reload(){
+	*this = load(configFilePath);
 }
 
 Conf Conf::defaultConf()

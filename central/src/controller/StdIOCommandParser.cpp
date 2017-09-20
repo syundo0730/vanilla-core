@@ -28,6 +28,10 @@ class StdIOCommandParserImpl : public StdIOCommandParser
         else if (parseSetJointAngleCommand(command_str, command))
         {
         }
+        else if (std::regex_match(command_str, std::regex("load_config")))
+        {
+            command = createCommand(CommandType::LoadConfig);
+        }
         return command;
     }
 

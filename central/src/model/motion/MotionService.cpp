@@ -14,6 +14,7 @@ class MotionServiceImpl : public MotionService
     Conf &conf;
     JointRepository &jointRepository;
 
+    std::string motionFileName;
     std::vector<Motion> motions;
     bool isPlaying;
     int playingMotionID, playingPoseIndex, playingStep;
@@ -27,9 +28,14 @@ class MotionServiceImpl : public MotionService
         : motionLoader(motionLoader),
           conf(conf),
           jointRepository(jointRepository),
-          motions(motionLoader.load("motion.yaml"))
+          motionFileName("motion.yaml"),
+          motions(motionLoader.load(motionFileName))
     {
         _reset();
+    }
+    void reloadMotion() override
+    {
+        motions = motionLoader.load(motionFileName);
     }
     void update() override
     {

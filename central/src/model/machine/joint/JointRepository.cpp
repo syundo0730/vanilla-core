@@ -51,9 +51,9 @@ class JointRepositoryImpl : public JointRepository
 	{
 		return jointMap[id].getTargetAngle();
 	}
-	void applyTargetAngle() override
+	void applyTargetAngle(bool forceApply) override
 	{
-		if (!needsApplication()) {
+		if (!forceApply && !needsApplication()) {
 			return;
 		}
 		std::vector<uint8_t> rsIDs;
@@ -77,6 +77,11 @@ class JointRepositoryImpl : public JointRepository
 			setCurrentJointAngle(jointID, target);
 		}
 		rsapi.sendMultiPosition(rsIDs, rsPositions);
+	}
+	void moveToInitialPose() override
+	{
+		resetTargetJointAngles();
+		applyTargetAngle(true);
 	}
 
   private:

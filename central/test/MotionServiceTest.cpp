@@ -46,7 +46,7 @@ TEST_F(MotionServiceTest, update)
 
     MockJointRepository mockJointRepository;
     EXPECT_CALL(mockJointRepository, getCurrentJointAngle(_))
-    .Times(12 * 2)
+    .Times(12 * 3)
     .WillRepeatedly(Return(JointAngle(10)));
     EXPECT_CALL(mockJointRepository, setTargetJointAngle(_, _)).Times(5 * (10 + 5));
 

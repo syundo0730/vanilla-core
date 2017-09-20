@@ -69,12 +69,16 @@ struct Conf
 	JointConf Joint;
 
   private:
+	std::string configFilePath;
+
+  private:
 	Conf load(std::string configFilePath);
 
   public:
 	static Conf defaultConf();
 	Conf() = default;
 	Conf(std::string configFilePath);
+	void reload();
 };
 
 #endif

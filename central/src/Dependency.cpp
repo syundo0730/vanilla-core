@@ -97,7 +97,7 @@ class DependencyImpl : public Dependency
 		  motionController(MotionController::instantiate(
 			  *commandBus, *motionService)),
 		  mainController(MainController::instantiate(
-			  *jointRepository, *walkController, *motionController, *motionSensor, *commandBus, *commandParser)),
+			  *jointRepository, *walkController, *motionController, *motionSensor, *commandBus, *commandParser, *conf)),
 		  stdIOCommandParser(StdIOCommandParser::instantiate()),
 		  stdIORouter(StdIORouter::instantiate(*commandBus, *stdIOCommandParser)),
 		  rangeSensorArray(RangeSensorArray::instantiate(*i2cdev)),

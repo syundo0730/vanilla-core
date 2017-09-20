@@ -15,6 +15,7 @@ public:
 			MotionLoader &motionLoader,
 			JointRepository &jointRepository,
 			Conf &conf);
+    virtual void reloadMotion() = 0;
 	virtual void update() = 0;
 	virtual void start(int) = 0;
 	virtual void stop() = 0;

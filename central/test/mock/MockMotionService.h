@@ -9,6 +9,7 @@
 class MockMotionService : public MotionService
 {
   public:
+    MOCK_METHOD0(reloadMotion, void(void));
     MOCK_METHOD0(update, void(void));
     MOCK_METHOD1(start, void(int));
     MOCK_METHOD0(stop, void(void));

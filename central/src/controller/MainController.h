@@ -9,6 +9,7 @@ class MotionController;
 class MotionSensor;
 class CommandBus;
 class CommandParser;
+class Conf;
 
 class MainController
 {
@@ -19,7 +20,8 @@ class MainController
 		MotionController &,
 		MotionSensor &,
 		CommandBus &,
-		CommandParser &);
+		CommandParser &,
+		Conf &);
 	virtual void update() = 0;
 	virtual void route(const uint8_t *data, std::size_t length) = 0;
 };

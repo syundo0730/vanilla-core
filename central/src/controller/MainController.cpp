@@ -6,6 +6,7 @@
 #include "MotionSensor.h"
 #include "CommandBus.h"
 #include "CommandParser.h"
+#include "Conf.h"
 #include <iostream>
 #include <cstdint>
 
@@ -18,6 +19,7 @@ class MainControllerImpl : public MainController
 	MotionSensor &motion_sensor;
 	CommandBus &command_bus;
 	CommandParser &commandParser;
+	Conf &conf;
 
   public:
 	MainControllerImpl(
@@ -26,14 +28,18 @@ class MainControllerImpl : public MainController
 		MotionController &motionController,
 		MotionSensor &motion_sensor,
 		CommandBus &command_bus,
-		CommandParser &commandParser)
+		CommandParser &commandParser,
+		Conf &conf)
 		: joint_repository(joint_repository),
 		  walk_controller(walk_controller),
 		  motionController(motionController),
 		  motion_sensor(motion_sensor),
 		  command_bus(command_bus),
-		  commandParser(commandParser)
+		  commandParser(commandParser),
+		  conf(conf)
 	{
+		command_bus.subscribe(
+			std::bind(&MainControllerImpl::onCommand, this, std::placeholders::_1));
 	}
 	void update() override
 	{
@@ -55,13 +61,28 @@ class MainControllerImpl : public MainController
 	{
 		std::cout << data << std::endl;
 		Command cmd;
-		try {
+		try
+		{
 			cmd = commandParser.parse(data, length);
-		} catch (const std::runtime_error& e) {
+		}
+		catch (const std::runtime_error &e)
+		{
 			std::cout << e.what() << std::endl;
 			return;
 		}
 		command_bus.publish(cmd);
+	}
+
+  private:
+	void onCommand(Command command)
+	{
+		if (command.commandType == CommandType::LoadConfig)
+		{
+			std::cout << "config file reloaded" << std::endl;
+			conf.reload();
+			std::cout << "move to initial pose" << std::endl;
+			joint_repository.moveToInitialPose();
+		}
 	}
 };
 
@@ -71,7 +92,8 @@ std::unique_ptr<MainController> MainController::instantiate(
 	MotionController &motionController,
 	MotionSensor &motionSensor,
 	CommandBus &commandBus,
-	CommandParser &commandParser)
+	CommandParser &commandParser,
+	Conf &conf)
 {
 	return std::make_unique<MainControllerImpl>(
 		jointRepository,
@@ -79,5 +101,6 @@ std::unique_ptr<MainController> MainController::instantiate(
 		motionController,
 		motionSensor,
 		commandBus,
-		commandParser);
+		commandParser,
+		conf);
 }

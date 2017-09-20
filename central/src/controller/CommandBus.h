@@ -16,6 +16,7 @@ enum class CommandType
 	MotionStop,
 	SetJointAngle,
 	ShowJointAngles,
+	LoadConfig,
 };
 
 struct Command

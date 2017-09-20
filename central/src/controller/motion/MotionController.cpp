@@ -39,12 +39,28 @@ class MotionControllerImpl : public MotionController
 			motionService.setTargetJointAngle(id, angle);
 		} else if (command.commandType == CommandType::ShowJointAngles) {
 			auto angles = motionService.getCurrentJointAngles();
-        for (const auto &kv : angles) {
-					auto id = kv.first;
-					auto value = kv.second;
-					std::cout << "id: " << id << " value: " << value << ", ";
+			std::vector<int16_t> anglesVec(angles.size());
+			for (const auto &kv : angles)
+			{
+				auto id = kv.first;
+				auto value = kv.second;
+				anglesVec[id] = value;
+			}
+			int i = 0;
+			for (const auto v : anglesVec)
+			{
+				if (i == 0) {
+					std::cout << v;
+				} else {
+					std::cout << "," << v;
 				}
-				std::cout << std::endl;
+				++i;
+			}
+			std::cout << std::endl;
+		} else if (command.commandType == CommandType::LoadConfig) {
+			std::cout << "motion reloading ..." << std::endl;
+			motionService.reloadMotion();
+			std::cout << "motion reloaded" << std::endl;
 		}
 	}
 };

@@ -12,7 +12,8 @@ public:
 	MOCK_METHOD2(setTargetJointAngle, void(int, JointAngle));
 	MOCK_METHOD1(getCurrentJointAngle, JointAngle(int));
 	MOCK_METHOD1(getTargetJointAngle, JointAngle(int));
-	MOCK_METHOD0(applyTargetAngle, void());
+	MOCK_METHOD1(applyTargetAngle, void(bool));
+	MOCK_METHOD0(moveToInitialPose, void());
 };
 
 #endif
