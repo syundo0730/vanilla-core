@@ -28,7 +28,7 @@ int main()
 	std::thread mainControlThread([&] {
 		std::cout << "main control thread started" << std::endl;
 		// control loop
-		Ticker ticker(10, std::bind(&MainController::update, controller));
+		Ticker ticker(20, std::bind(&MainController::update, controller));
 		ticker.start();
 	});
 
@@ -37,7 +37,7 @@ int main()
 	std::thread autoControlThread([&] {
 		std::cout << "auto control thread started" << std::endl;
 		// control loop
-		Ticker ticker(20, std::bind(&AutoController::update, autoController));
+		Ticker ticker(100, std::bind(&AutoController::update, autoController));
 		ticker.start();
 	});
 
