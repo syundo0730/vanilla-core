@@ -25,24 +25,24 @@ class RangeSensorArrayImpl : public RangeSensorArray
         : i2cdev(i2cdev),
           sensorSettings({
               sensorSetting{
-                  xshutPinNum : 11,
-                  intPinNum : 18,
-                  address : 0x20,
+                  xshutPinNum : 22,
+                  intPinNum : 19,
+                  address : 0x08,
               },
               sensorSetting{
-                  xshutPinNum : 12,
-                  intPinNum : 18,
-                  address : 0x30,
-              },
-              sensorSetting{
-                  xshutPinNum : 15,
-                  intPinNum : 18,
-                  address : 0x40,
+                  xshutPinNum : 18,
+                  intPinNum : 15,
+                  address : 0x18,
               },
               sensorSetting{
                   xshutPinNum : 16,
-                  intPinNum : 18,
-                  address : 0x50,
+                  intPinNum : 13,
+                  address : 0x28,
+              },
+              sensorSetting{
+                  xshutPinNum : 12,
+                  intPinNum : 11,
+                  address : 0x38,
               },
           })
     {
@@ -53,12 +53,13 @@ class RangeSensorArrayImpl : public RangeSensorArray
             ++i;
         }
         timer::waitMs(500);
-        std::cout << "init done" << std::endl;
+        std::cout << "start initializing range sernsor array" << std::endl;
         i = 0;
         for (auto &s : sensorSettings) {
             rangeSensors[i]->activate(s.address);
             ++i;
         }
+        std::cout << "initializing range sernsor array ended" << std::endl;
     }
 
     std::vector<uint16_t> readRanges() override {

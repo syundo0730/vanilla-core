@@ -3,6 +3,7 @@
 #include "JointRepository.h"
 #include "JointAngle.h"
 #include "Timer.h"
+#include <iostream>
 
 class ActiveRangeSensorArrayImpl : public ActiveRangeSensorArray
 {
@@ -15,7 +16,7 @@ class ActiveRangeSensorArrayImpl : public ActiveRangeSensorArray
     int currentStep;
     int16_t currentAngle;
     std::vector<uint16_t> ranges;
-    Listener *listener;
+    Listener listener;
 
     static const int16_t RANGE_UPPER = 450;
     static const int16_t RANGE_LOWER = -450;
@@ -66,7 +67,7 @@ class ActiveRangeSensorArrayImpl : public ActiveRangeSensorArray
         }
     }
 
-    void setListener(Listener *l) override
+    void setListener(Listener l) override
     {
         listener = l;
     }
@@ -79,7 +80,7 @@ class ActiveRangeSensorArrayImpl : public ActiveRangeSensorArray
 
     void onScanEnded()
     {
-        (*listener)(ranges);
+        listener(ranges);
         moveClockwise = !moveClockwise;
         currentStep = 0;
     }

@@ -23,7 +23,7 @@ public:
       int jointID);
   virtual void moveToInitialPosition() = 0;
   virtual void update() = 0;
-  virtual void setListener(Listener *) = 0;
+  virtual void setListener(Listener) = 0;
 };
 
 #endif // ACTIVE_RANGE_SENSOR_ARRAY_H

@@ -39,7 +39,7 @@ TEST_F(ActiveRangeSensorArrayTest, update)
         }
         std::cout << std::endl;
     };
-    asa->setListener(&onRead);
+    asa->setListener(onRead);
     asa->moveToInitialPosition();
 
     for (int i = 0; i < 100; ++i) {
