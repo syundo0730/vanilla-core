@@ -39,6 +39,7 @@ include_directories(
   src/model/machine/joint/conf
   src/model/machine/leg
   src/model/motion
+  src/model/processor
   src/model/sensor
   src/model/sensor/motion
   src/model/sensor/motion/filter
@@ -61,11 +62,11 @@ add_executable(Main
   src/api/i2c/mpu/mpu6050/MPU6050.cpp
   src/api/i2c/mpu/mpu6050/MPU6050_6Axis_MotionApps20.cpp
   src/api/i2c/pwmdriver/Adafruit_PWMServoDriver.cpp
+  src/api/i2c/vl53l0x/VL53L0X.cpp
   src/api/serial/SerialApi.cpp
   src/api/serial/servo/futaba/RSApi.cpp
   src/api/websocket/rosbridge/ROSBridgeApi.cpp
   src/api/websocket/WebsocketApi.cpp
-  src/api/i2c/vl53l0x/VL53L0X.cpp
   src/common/Ticker.cpp
   src/common/Timer.cpp
   src/common/utility.cpp
@@ -87,6 +88,9 @@ add_executable(Main
   src/model/machine/leg/LegKinematics.cpp
   src/model/motion/MotionLoader.cpp
   src/model/motion/MotionService.cpp
+  src/model/processor/AccelerationProcessor.cpp
+  src/model/processor/InvalidRangeException.cpp
+  src/model/processor/RangeDataProcessor.cpp
   src/model/sensor/motion/filter/MadgwickQuaternionFilter.cpp
   src/model/sensor/motion/MotionSensor.cpp
   src/model/sensor/motion/mpu6050/MPU6050_DMP.cpp

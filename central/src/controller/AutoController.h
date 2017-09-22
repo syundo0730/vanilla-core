@@ -5,12 +5,18 @@
 
 class CommandBus;
 class ActiveRangeSensorArray;
+class MotionSensor;
+class AccelerationProcessor;
+class RangeDataProcessor;
 
 class AutoController
 {
   public:
     static std::unique_ptr<AutoController> instantiate(
         ActiveRangeSensorArray &,
+        MotionSensor &,
+        AccelerationProcessor &,
+        RangeDataProcessor &,
         CommandBus &);
     virtual void update() = 0;
 };

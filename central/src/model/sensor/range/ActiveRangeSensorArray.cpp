@@ -44,7 +44,7 @@ class ActiveRangeSensorArrayImpl : public ActiveRangeSensorArray
 
     void moveToInitialPosition() override
     {
-        auto targetAngle = -RANGE_UPPER;
+        auto targetAngle = RANGE_LOWER;
         setTargetJointAngle(targetAngle);
         currentStep = 0;
         currentAngle = targetAngle;

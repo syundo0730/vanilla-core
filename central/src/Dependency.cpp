@@ -27,6 +27,8 @@
 #include "RangeSensor.h"
 #include "RangeSensorArray.h"
 #include "ActiveRangeSensorArray.h"
+#include "AccelerationProcessor.h"
+#include "RangeDataProcessor.h"
 
 class DependencyImpl : public Dependency
 {
@@ -62,6 +64,8 @@ class DependencyImpl : public Dependency
 
 	std::unique_ptr<RangeSensorArray> rangeSensorArray;
 	std::unique_ptr<ActiveRangeSensorArray> activeRangeSensorArray;
+	std::unique_ptr<AccelerationProcessor> accelerationProcessor;
+	std::unique_ptr<RangeDataProcessor> rangeDataProcessor;
 	std::unique_ptr<AutoController> autoController;
 
   public:
@@ -102,7 +106,10 @@ class DependencyImpl : public Dependency
 		  stdIORouter(StdIORouter::instantiate(*commandBus, *stdIOCommandParser)),
 		  rangeSensorArray(RangeSensorArray::instantiate(*i2cdev)),
 		  activeRangeSensorArray(ActiveRangeSensorArray::instantiate(*rangeSensorArray, *jointRepository, 21)),
-		  autoController(AutoController::instantiate(*activeRangeSensorArray, *commandBus))
+		  accelerationProcessor(AccelerationProcessor::instantiate()),
+		  rangeDataProcessor(RangeDataProcessor::instantiate()),
+		  autoController(AutoController::instantiate(
+			  *activeRangeSensorArray, *motionSensor, *accelerationProcessor, *rangeDataProcessor, *commandBus))
 	{
 	}
 
