@@ -91,6 +91,7 @@ add_executable(Test
   LegControlServiceTest.cpp
   LegKinematicsTest.cpp
   JointRepositoryTest.cpp
+  JointRepositorySpy.cpp
   WalkControllerTest.cpp
   MotionLoaderTest.cpp
   MotionServiceTest.cpp
