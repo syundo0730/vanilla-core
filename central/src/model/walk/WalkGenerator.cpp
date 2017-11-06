@@ -5,6 +5,7 @@
 #include "LinearInvertedPendulum.h"
 #include "SwingLegTrajectory.h"
 #include "CPStabilizer.h"
+#include "Interpolator.h"
 #include "conf.h"
 #include <iostream>
 #include <fstream>
@@ -17,11 +18,13 @@ class WalkGeneratorImpl : public WalkGenerator
 	LinearInvertedPendulum &linear_inverted_pendulum;
 	SwingLegTrajectory &swingLegTrajectory;
 	CPStabilizer &stablizer;
-	const double Tsup;
+	Interpolator &interpolator;
+	const double Tsup, Tdbl;
 	double z_c;
 	const int prediction_step_num;
 	double dt;
 	double time = 0;
+	double dblSupTime = 0;
 	bool is_first_step = true, will_stop = false, isWalking = false;
 	Gait currentGait;
 	int remainingStep = 0;
@@ -32,11 +35,14 @@ class WalkGeneratorImpl : public WalkGenerator
 		LinearInvertedPendulum &linear_inverted_pendulum,
 		SwingLegTrajectory &swingLegTrajectory,
 		CPStabilizer &stablizer,
+		Interpolator &interpolator,
 		Conf &conf)
 		: linear_inverted_pendulum(linear_inverted_pendulum),
 		  swingLegTrajectory(swingLegTrajectory),
 		  stablizer(stablizer),
+		  interpolator(interpolator),
 		  Tsup(conf.Walk.DefaultTsup),
+		  Tdbl(0.1),
 		  z_c(conf.Walk.DefaultZc),
 		  prediction_step_num(conf.Walk.PredictionStepNum),
 		  dt(conf.System.IntervalSec),
@@ -48,7 +54,9 @@ class WalkGeneratorImpl : public WalkGenerator
 			left_leg_position: Vector3(0, 0.1, 0),
 			right_leg_position: Vector3(0, -0.1, 0),
 			supporting_leg_side: LegSide::RIGHT,
-			body_position: Vector3(0, 0, z_c)
+			body_position: Vector3(0, 0, z_c),
+			body_velocity: Vector3(0, 0, 0),
+			body_acceleration: Vector3(0, 0, 0),
 		};
 	}
 	void start() override
@@ -72,9 +80,10 @@ class WalkGeneratorImpl : public WalkGenerator
 		if (!isWalking) {
 			return;
 		}
-		if (time > Tsup)
+		if (dblSupTime > Tdbl)
 		{
 			time = 0;
+			dblSupTime = 0;
 			if (is_first_step) {
 				is_first_step = false;
 			}
@@ -104,8 +113,19 @@ class WalkGeneratorImpl : public WalkGenerator
 			onStop();
 			return;
 		}
-		updateState();
-		time += dt;
+		if (time >= 0 && time < Tsup)
+		{
+			updateState();
+			time += dt;
+		}
+		else
+		{
+			if (dblSupTime == 0) {
+				initializeDblSupState();
+			}
+			updateDblSupState();
+			dblSupTime += dt;
+		}
 	}
 	WalkState getState() override
 	{
@@ -126,21 +146,38 @@ class WalkGeneratorImpl : public WalkGenerator
 		auto support = linear_inverted_pendulum.getState(time, index);
 		auto swingTarget = linear_inverted_pendulum.getState(time, index + 1);
 
+		auto supportLegPos = support.support_position;
 		auto swingLegPos = is_first_step
-							   ? projectTo(swingTarget.support_position, 0)
-							   : swingLegTrajectory.generate(projectTo(swingTarget.support_position, 0), time);
-		auto supportLegPos = projectTo(support.support_position, 0);
+							   ? swingTarget.support_position
+							   : swingLegTrajectory.generate(swingTarget.support_position, time);
 
 		auto leftLegPos = support.leg_side == LegSide::LEFT ? supportLegPos : swingLegPos;
 		auto rightLegPos = support.leg_side == LegSide::RIGHT ? supportLegPos : swingLegPos;
-		auto bodyPos = projectTo(support.position, z_c);
+		auto bodyPos = support.position;
+		auto bodyVel = support.velocity;
+		auto bodyAcc = support.acceleration;
 
 		currentState = WalkState{
 			left_leg_position : leftLegPos,
 			right_leg_position : rightLegPos,
 			supporting_leg_side : support.leg_side,
-			body_position : bodyPos
+			body_position : bodyPos,
+			body_velocity: bodyVel,
+			body_acceleration: bodyAcc
 		};
+	}
+	void initializeDblSupState() {
+		interpolator.initialize(
+			currentState.body_position,
+			currentState.body_velocity,
+			currentState.body_acceleration,
+			Tdbl);
+	}
+	void updateDblSupState() {
+		auto pos = interpolator.getPosition(dblSupTime);
+
+		currentState.body_position = pos;
+		currentState.supporting_leg_side = LegSide::BOTH;
 	}
 	void reset()
 	{
@@ -152,14 +189,6 @@ class WalkGeneratorImpl : public WalkGenerator
 	}
 	void onStop() {
 		reset();
-	}
-	Vector3 projectTo(Vector2 src, double z)
-	{
-		return Vector3(
-			src[0],
-			src[1],
-			z
-		);
 	}
 	void generateTargetTrajectory(
 		bool _is_first_step,
@@ -231,11 +260,13 @@ std::unique_ptr<WalkGenerator> WalkGenerator::instantiate(
 	LinearInvertedPendulum &linear_inverted_pendulum,
 	SwingLegTrajectory &swingLegTrajectory,
 	CPStabilizer &stablizer,
+	Interpolator &interpolator,
 	Conf &conf)
 {
 	return std::make_unique<WalkGeneratorImpl>(
 		linear_inverted_pendulum,
 		swingLegTrajectory,
 		stablizer,
+		interpolator,
 		conf);
 }

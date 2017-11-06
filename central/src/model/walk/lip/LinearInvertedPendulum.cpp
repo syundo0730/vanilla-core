@@ -8,6 +8,7 @@ class LinearInvertedPendulumImpl : public LinearInvertedPendulum
   private:
 	double Tsup;
 	double z_c;
+	double omega;
 	double Tc;
 	double C;
 	double S;
@@ -31,7 +32,8 @@ class LinearInvertedPendulumImpl : public LinearInvertedPendulum
 		Tsup = _Tsup;
 		z_c = _z_c;
 		using Physic::g;
-		Tc = sqrt(z_c / g);
+		omega = z_c / g;
+		Tc = sqrt(omega);
 		C = cosh(Tsup / Tc);
 		S = sinh(Tsup / Tc);
 	}
@@ -84,13 +86,22 @@ class LinearInvertedPendulumImpl : public LinearInvertedPendulum
 		auto counter_side = supporting_leg_side == LegSide::RIGHT ? LegSide::LEFT : LegSide::RIGHT;
 		auto leg_side = n % 2 == 0 ? supporting_leg_side : counter_side;
 		return LIPState{
-			cog.first,		 // position
-			cog.second,		 // velocity
-			target_x_leg[n], // leg tip position
-			leg_side};		 // side of supporting leg
+			projectTo(cog[0], z_c), // position
+			projectTo(cog[1], 0), // velocity
+			projectTo(cog[2], 0), // acceleration
+			projectTo(target_x_leg[n], 0), // leg tip position
+			leg_side}; // side of supporting leg
 	}
 
   private:
+	Vector3 projectTo(Vector2 src, double z)
+	{
+		return Vector3(
+			src[0],
+			src[1],
+			z
+		);
+	}
 	void initLegParamAndTarget(
 		const Vector2 &xi0,
 		const Vector2 &vi0,
@@ -121,13 +132,16 @@ class LinearInvertedPendulumImpl : public LinearInvertedPendulum
 		return Vector2((C + 1) * p[0] / (Tc * S),
 							   (C - 1) * p[1] / (Tc * S));
 	}
-	std::pair<Vector2, Vector2> calcCogTrajectory(double t, int n)
+	std::array<Vector2, 3> calcCogTrajectory(double t, int n)
 	{
 		double cosht = cosh(t / Tc);
 		double sinht = sinh(t / Tc);
-		return std::pair<Vector2, Vector2>(
-			(xi[n] - target_x_leg[n]) * cosht + Tc * vi[n] * sinht + target_x_leg[n],
-			(xi[n] - target_x_leg[n]) / Tc * sinht + vi[n] * cosht);
+		auto x = (xi[n] - target_x_leg[n]) * cosht + Tc * vi[n] * sinht + target_x_leg[n];
+		auto v = (xi[n] - target_x_leg[n]) / Tc * sinht + vi[n] * cosht;
+		auto a = omega * x;
+
+		std::array<Vector2, 3> cog{{x, v, a}};
+		return cog;
 	}
 };
 

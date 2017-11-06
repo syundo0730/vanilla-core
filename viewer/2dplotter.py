@@ -12,12 +12,15 @@ def main():
     args = parser.parse_args()
     file_name = args.f
     raw_names = [
-        ['t', 'a0'],
-        ['t', 'a1'],
-        ['t', 'a2'],
-        ['t', 'a3'],
-        ['t', 'a4'],
-        ['t', 'a5']
+        # ['t', 'a0'],
+        # ['t', 'a1'],
+        # ['t', 'a2'],
+        # ['t', 'a3'],
+        # ['t', 'a4'],
+        # ['t', 'a5']
+        ['llx', 'lly'],
+        ['rlx', 'rly'],
+        ['gx', 'gy']
     ]
     raw = pd.read_csv(file_name)
     data = list(generate_traces(raw, raw_names))

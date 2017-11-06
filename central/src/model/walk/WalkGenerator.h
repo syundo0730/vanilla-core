@@ -8,6 +8,7 @@
 class LinearInvertedPendulum;
 class SwingLegTrajectory;
 class CPStabilizer;
+class Interpolator;
 class Conf;
 
 class WalkGenerator
@@ -17,6 +18,7 @@ class WalkGenerator
 		LinearInvertedPendulum &linear_inverted_pendulum,
 		SwingLegTrajectory &swingLegTrajectory,
 		CPStabilizer &stablizer,
+		Interpolator &interpolator,
 		Conf &conf);
 	virtual void update() = 0;
 	virtual void update(Gait gait) = 0;

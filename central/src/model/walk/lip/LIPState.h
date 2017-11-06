@@ -3,9 +3,10 @@
 #include "dimensional_types.h"
  
 struct LIPState {
-	Vector2 position;
-	Vector2 velocity;
-	Vector2 support_position;
+	Vector3 position;
+	Vector3 velocity;
+	Vector3 acceleration;
+	Vector3 support_position;
 	LegSide leg_side;
 };
  

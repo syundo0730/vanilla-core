@@ -78,6 +78,7 @@ add_executable(Test
   ${SRC}/model/machine/joint/JointRepository.cpp
   ${SRC}/model/motion/MotionLoader.cpp
   ${SRC}/model/motion/MotionService.cpp
+  ${SRC}/model/walk/Interpolator.cpp
   ${SRC}/model/walk/WalkGenerator.cpp
   ${SRC}/model/walk/lip/LinearInvertedPendulum.cpp
   ${SRC}/model/walk/stabilizer/CPStabilizer.cpp
@@ -87,6 +88,7 @@ add_executable(Test
   ConfTest.cpp
   CommandParserTest.cpp
   CPStabilizerTest.cpp
+  InterpolatorTest.cpp
   WalkGeneratorTest.cpp
   LegControlServiceTest.cpp
   LegKinematicsTest.cpp

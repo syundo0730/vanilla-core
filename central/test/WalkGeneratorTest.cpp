@@ -2,6 +2,7 @@
 #include "WalkGenerator.h"
 #include "LinearInvertedPendulum.h"
 #include "SwingLegTrajectory.h"
+#include "Interpolator.h"
 #include "MockCPStabilizer.h"
 #include "dimensional_types.h"
 #include "conf.h"
@@ -20,15 +21,18 @@ TEST_F(WalkGeneratorTest, test)
 	auto conf = Conf::defaultConf();
 	auto lip = LinearInvertedPendulum::instantiate(conf);
 	auto swingTraj = SwingLegTrajectory::instantiate(conf);
+	auto interpolator = Interpolator::instantiate();
 	auto wg = WalkGenerator::instantiate(
 		*lip,
 		*swingTraj,
 		mockCPStabilizer,
+		*interpolator,
 		conf);
 
 	auto Tsup = conf.Walk.DefaultTsup;
+	auto Tdbl = 0.2;
 	auto dt = conf.System.IntervalSec;
-	auto unitCount = Tsup / dt;
+	auto unitCount = (Tsup + Tdbl) / dt;
 	auto stepNum = unitCount * 10;
 
 	std::ofstream ofs("data.csv");
@@ -38,17 +42,21 @@ TEST_F(WalkGeneratorTest, test)
 	wg->update(Gait{Vector2(0.1, 0.2), 0});
 	for (auto i = 0; i < stepNum; ++i)
 	{
-		if (i == unitCount * 3) {
-			wg->update(Gait{Vector2(0.2, 0.2), 0});
-		}
-		if (i == unitCount * 5) {
-			wg->update(Gait{Vector2(0.1, 0.2), 0});
-		}
+		// if (i == unitCount * 3) {
+		// 	wg->update(Gait{Vector2(0.2, 0.2), 0});
+		// }
+		// if (i == unitCount * 5) {
+		// 	wg->update(Gait{Vector2(0.1, 0.2), 0});
+		// }
 		if (i == unitCount * 6) {
 			wg->stop();
 		}
 		wg->update();
 		auto state = wg->getState();
+
+		// if (state.supporting_leg_side != LegSide::BOTH) {
+		// 	continue;
+		// }
 		auto llx = state.left_leg_position[0];
 		auto lly = state.left_leg_position[1];
 		auto llz = state.left_leg_position[2];
