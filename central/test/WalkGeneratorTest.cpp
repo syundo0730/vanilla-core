@@ -30,9 +30,8 @@ TEST_F(WalkGeneratorTest, test)
 		conf);
 
 	auto Tsup = conf.Walk.DefaultTsup;
-	auto Tdbl = 0.2;
 	auto dt = conf.System.IntervalSec;
-	auto unitCount = (Tsup + Tdbl) / dt;
+	auto unitCount = Tsup / dt;
 	auto stepNum = unitCount * 10;
 
 	std::ofstream ofs("data.csv");
@@ -54,18 +53,15 @@ TEST_F(WalkGeneratorTest, test)
 		wg->update();
 		auto state = wg->getState();
 
-		// if (state.supporting_leg_side != LegSide::BOTH) {
-		// 	continue;
-		// }
-		auto llx = state.left_leg_position[0];
-		auto lly = state.left_leg_position[1];
-		auto llz = state.left_leg_position[2];
-		auto rlx = state.right_leg_position[0];
-		auto rly = state.right_leg_position[1];
-		auto rlz = state.right_leg_position[2];
-		auto gx = state.body_position[0];
-		auto gy = state.body_position[1];
-		auto gz = state.body_position[2];
+		auto llx = state.leftLegPosition[0];
+		auto lly = state.leftLegPosition[1];
+		auto llz = state.leftLegPosition[2];
+		auto rlx = state.rightLegPosition[0];
+		auto rly = state.rightLegPosition[1];
+		auto rlz = state.rightLegPosition[2];
+		auto gx = state.cog.position[0];
+		auto gy = state.cog.position[1];
+		auto gz = state.cog.position[2];
 
 		ofs
 		<< llx << ","

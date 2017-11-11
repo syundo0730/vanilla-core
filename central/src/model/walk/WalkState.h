@@ -2,14 +2,13 @@
 #define WALK_STATE_H
 #include "dimensional_types.h"
 #include "LegSide.h"
+#include "COGState.h"
  
 struct WalkState {
-	Vector3 left_leg_position;
-	Vector3 right_leg_position;
-	LegSide supporting_leg_side;
-	Vector3 body_position;
-	Vector3 body_velocity;
-	Vector3 body_acceleration;
+	Vector3 leftLegPosition;
+	Vector3 rightLegPosition;
+	LegSide supportingLegSide;
+	COGState cog;
 };
  
 #endif // WALK_STATE_H

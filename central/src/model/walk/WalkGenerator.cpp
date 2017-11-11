@@ -15,53 +15,43 @@
 class WalkGeneratorImpl : public WalkGenerator
 {
   private:
-	LinearInvertedPendulum &linear_inverted_pendulum;
+	LinearInvertedPendulum &linearInvertedPendulum;
 	SwingLegTrajectory &swingLegTrajectory;
 	CPStabilizer &stablizer;
 	Interpolator &interpolator;
-	const double Tsup, Tdbl;
-	double z_c;
-	const int prediction_step_num;
-	double dt;
-	double time = 0;
-	double dblSupTime = 0;
-	bool is_first_step = true, will_stop = false, isWalking = false;
+	double time, dt, Tsup, Tdbl;
+	double Zc;
+	const int predictionStepNum;
+	bool isFirstStep = true, willStop = false, isWalking = false;
 	Gait currentGait;
 	int remainingStep = 0;
-	WalkState currentState;
+	LegSide supportingSide;
 
   public:
 	WalkGeneratorImpl(
-		LinearInvertedPendulum &linear_inverted_pendulum,
+		LinearInvertedPendulum &linearInvertedPendulum,
 		SwingLegTrajectory &swingLegTrajectory,
 		CPStabilizer &stablizer,
 		Interpolator &interpolator,
 		Conf &conf)
-		: linear_inverted_pendulum(linear_inverted_pendulum),
+		: linearInvertedPendulum(linearInvertedPendulum),
 		  swingLegTrajectory(swingLegTrajectory),
 		  stablizer(stablizer),
 		  interpolator(interpolator),
+		  time(0),
+		  dt(conf.System.IntervalSec),
 		  Tsup(conf.Walk.DefaultTsup),
 		  Tdbl(0.1),
-		  z_c(conf.Walk.DefaultZc),
-		  prediction_step_num(conf.Walk.PredictionStepNum),
-		  dt(conf.System.IntervalSec),
+		  Zc(conf.Walk.DefaultZc),
+		  predictionStepNum(conf.Walk.PredictionStepNum),
 		  currentGait({Vector2(conf.Walk.DefaultTargetLongitudinalStepLength,
 						conf.Walk.DefaultTargetHorizontalStepLength),
-				0})
-	{
-		currentState = WalkState{
-			left_leg_position: Vector3(0, 0.1, 0),
-			right_leg_position: Vector3(0, -0.1, 0),
-			supporting_leg_side: LegSide::RIGHT,
-			body_position: Vector3(0, 0, z_c),
-			body_velocity: Vector3(0, 0, 0),
-			body_acceleration: Vector3(0, 0, 0),
-		};
+				0}){
+				linearInvertedPendulum.setParams(Tsup, Zc);
 	}
 	void start() override
 	{
-		if (will_stop) {
+		if (willStop) {
 			return;
 		}
 		reset();
@@ -69,7 +59,7 @@ class WalkGeneratorImpl : public WalkGenerator
 	}
 	void stop() override
 	{
-		will_stop = true;
+		willStop = true;
 	}
 	void update(Gait gait) override
 	{
@@ -80,32 +70,24 @@ class WalkGeneratorImpl : public WalkGenerator
 		if (!isWalking) {
 			return;
 		}
-		if (dblSupTime > Tdbl)
+		if (time > Tsup)
 		{
 			time = 0;
-			dblSupTime = 0;
-			if (is_first_step) {
-				is_first_step = false;
+			if (isFirstStep) {
+				isFirstStep = false;
 			}
+			exhangeSupportLegSide();
 		}
 		if (time == 0)
 		{
-			// 遊脚のパラメタの初期化
-			swingLegTrajectory.initialize(
-				Tsup,
-				0.2,
-				currentState.supporting_leg_side == LegSide::LEFT
-					? currentState.left_leg_position
-					: currentState.right_leg_position);
-			if (will_stop)
+			if (willStop)
 			{
 				remainingStep--;
 			} else {
-				// 1周期ごとに目標重心軌道を計算する
-				generateTargetTrajectory(
-					is_first_step,
-					currentGait.step_amount[0],
-					currentGait.step_amount[1]);
+				linearInvertedPendulum.optimizeStep(
+					isFirstStep,
+					supportingSide,
+					currentGait);
 			}
 		}
 		if (remainingStep <= 0)
@@ -113,23 +95,7 @@ class WalkGeneratorImpl : public WalkGenerator
 			onStop();
 			return;
 		}
-		if (time >= 0 && time < Tsup)
-		{
-			updateState();
-			time += dt;
-		}
-		else
-		{
-			if (dblSupTime == 0) {
-				initializeDblSupState();
-			}
-			updateDblSupState();
-			dblSupTime += dt;
-		}
-	}
-	WalkState getState() override
-	{
-		return currentState;
+		time += dt;
 	}
 	Gait getGait() override
 	{
@@ -139,107 +105,39 @@ class WalkGeneratorImpl : public WalkGenerator
 	{
 		return isWalking;
 	}
+  	WalkState getState() {
+		int index = predictionStepNum - remainingStep;
+		auto cog = linearInvertedPendulum.getCOGState(time, index);
+		auto legPos = linearInvertedPendulum.getTargetLegPos(index);
 
-  private:
-  	void updateState() {
-		int index = prediction_step_num - remainingStep;
-		auto support = linear_inverted_pendulum.getState(time, index);
-		auto swingTarget = linear_inverted_pendulum.getState(time, index + 1);
-
-		auto supportLegPos = support.support_position;
-		auto swingLegPos = is_first_step
-							   ? swingTarget.support_position
-							   : swingLegTrajectory.generate(swingTarget.support_position, time);
-
-		auto leftLegPos = support.leg_side == LegSide::LEFT ? supportLegPos : swingLegPos;
-		auto rightLegPos = support.leg_side == LegSide::RIGHT ? supportLegPos : swingLegPos;
-		auto bodyPos = support.position;
-		auto bodyVel = support.velocity;
-		auto bodyAcc = support.acceleration;
-
-		currentState = WalkState{
-			left_leg_position : leftLegPos,
-			right_leg_position : rightLegPos,
-			supporting_leg_side : support.leg_side,
-			body_position : bodyPos,
-			body_velocity: bodyVel,
-			body_acceleration: bodyAcc
+		return WalkState{
+			leftLegPosition : legPos,
+			rightLegPosition : legPos,
+			supportingLegSide: supportingSide,
+			cog: cog
 		};
 	}
-	void initializeDblSupState() {
-		interpolator.initialize(
-			currentState.body_position,
-			currentState.body_velocity,
-			currentState.body_acceleration,
-			Tdbl);
-	}
-	void updateDblSupState() {
-		auto pos = interpolator.getPosition(dblSupTime);
-
-		currentState.body_position = pos;
-		currentState.supporting_leg_side = LegSide::BOTH;
-	}
+  private:
 	void reset()
 	{
 		isWalking = false;
-		is_first_step = true;
-		will_stop = false;
+		isFirstStep = true;
+		willStop = false;
 		time = 0;
-		remainingStep = prediction_step_num;
+		supportingSide = LegSide::RIGHT;
+		remainingStep = predictionStepNum;
 	}
 	void onStop() {
 		reset();
 	}
-	void generateTargetTrajectory(
-		bool _is_first_step,
-		double _target_longitudinal_step_length,
-		double _target_horizontal_step_length)
-	{
-		Vector2IntMap walk_param;
-		// 1歩目
-		if (_is_first_step)
-		{
-			walk_param[1] = Vector2(
-				0,
-				_target_horizontal_step_length);
-		}
-		else
-		{
-			walk_param[1] = Vector2(
-				_target_longitudinal_step_length,
-				_target_horizontal_step_length);
-		}
-		// 2歩目〜最終の一つ前
-		for (int i = 2; i < prediction_step_num; ++i)
-		{
-			walk_param[i] = Vector2(
-				_target_longitudinal_step_length,
-				_target_horizontal_step_length);
-		}
-		// 最後
-		walk_param[prediction_step_num] = Vector2(
-			0,
-			_target_horizontal_step_length);
-
-		linear_inverted_pendulum.setInitialParam(Tsup, z_c);
-		if (_is_first_step)
-		{
-			// 初期化
-			linear_inverted_pendulum.setupFirstStep(walk_param, currentState.supporting_leg_side);
-		}
-		else
-		{
-			// 支持脚を入れ替える
-			linear_inverted_pendulum.switchToNextStep(walk_param);
-		}
-		// 脚接地点の最適化
-		linear_inverted_pendulum.optimize(10, 1);
+	void exhangeSupportLegSide() {
+		supportingSide = supportingSide == LegSide::RIGHT ? LegSide::LEFT : LegSide::RIGHT;
 	}
 };
 
 // WalkState WalkGenerator::stabilize(double t, int n) {
-//     auto cog = linear_inverted_pendulum.calcCogTrajectory(t, n);
-//     auto cog_d = linear_inverted_pendulum.calcCogTrajectory(t + cp_time_shift, n);
+//     auto cog = linearInvertedPendulum.calcCogTrajectory(t, n);
+//     auto cog_d = linearInvertedPendulum.calcCogTrajectory(t + cp_time_shift, n);
 // 	auto current_state = std::pair<Vector2, Vector2>(
 // 		Vector2(cog.first[0], cog.second[0]),
 // 		Vector2(cog.first[1], cog.second[1])
@@ -257,14 +155,14 @@ class WalkGeneratorImpl : public WalkGenerator
 // }
 
 std::unique_ptr<WalkGenerator> WalkGenerator::instantiate(
-	LinearInvertedPendulum &linear_inverted_pendulum,
+	LinearInvertedPendulum &linearInvertedPendulum,
 	SwingLegTrajectory &swingLegTrajectory,
 	CPStabilizer &stablizer,
 	Interpolator &interpolator,
 	Conf &conf)
 {
 	return std::make_unique<WalkGeneratorImpl>(
-		linear_inverted_pendulum,
+		linearInvertedPendulum,
 		swingLegTrajectory,
 		stablizer,
 		interpolator,

@@ -3,7 +3,7 @@
 #include "dimensional_types.h"
 
 struct Gait {
-	Vector2 step_amount;
+	Vector2 stepAmount;
 	double direction;
 };
  

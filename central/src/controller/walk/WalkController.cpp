@@ -32,8 +32,8 @@ class WalkControllerImpl : public WalkController
 		walkGenerator.update();
 		auto state = walkGenerator.getState();
 		legControlService.setEndEffectorPosition(
-			state.left_leg_position - state.body_position,
-			state.right_leg_position - state.body_position);
+			state.leftLegPosition - state.cog.position,
+			state.rightLegPosition - state.cog.position);
 	}
 
   private:
