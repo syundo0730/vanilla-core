@@ -40,23 +40,23 @@ joint:
     1:
       motor_type: 1
       real_id: 0
-      offset: 0
+      offset: 40
     2:
       motor_type: 1
       real_id: 1
-      offset: 0
+      offset: 50
     3:
       motor_type: 1
       real_id: 2
-      offset: 0
+      offset: 535
     4:
       motor_type: 1
       real_id: 3
-      offset: 0
+      offset: 80
     5:
       motor_type: 1
       real_id: 4
-      offset: 0
+      offset: 30
     6:
       motor_type: 0
       real_id: 2
@@ -64,23 +64,23 @@ joint:
     7:
       motor_type: 1
       real_id: 11
-      offset: 0
+      offset: 65
     8:
       motor_type: 1
       real_id: 12
-      offset: 0
+      offset: 40
     9:
       motor_type: 1
       real_id: 13
-      offset: 0
+      offset: -375
     10:
       motor_type: 1
       real_id: 14
-      offset: 0
+      offset: 60
     11:
       motor_type: 1
       real_id: 15
-      offset: 0
+      offset: 40
     12:
       motor_type: 0
       real_id: 3
@@ -92,11 +92,11 @@ joint:
     14:
       motor_type: 0
       real_id: 5
-      offset: 0
+      offset: -600
     15:
       motor_type: 0
       real_id: 6
-      offset: 0
+      offset: -900
     16:
       motor_type: 0
       real_id: 7
@@ -108,11 +108,11 @@ joint:
     18:
       motor_type: 0
       real_id: 9
-      offset: 0
+      offset: 600
     19:
       motor_type: 0
       real_id: 10
-      offset: 0
+      offset: 900
     20:
       motor_type: 0
       real_id: 11

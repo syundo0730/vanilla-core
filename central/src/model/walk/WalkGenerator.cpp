@@ -70,30 +70,28 @@ class WalkGeneratorImpl : public WalkGenerator
 		if (!isWalking) {
 			return;
 		}
-		if (time > Tsup)
-		{
-			time = 0;
+		if (time > Tsup) {
 			if (isFirstStep) {
 				isFirstStep = false;
 			}
-			exhangeSupportLegSide();
-		}
-		if (time == 0)
-		{
-			if (willStop)
-			{
+			if (willStop) {
 				remainingStep--;
-			} else {
+			}
+			if (remainingStep <= 0) {
+				remainingStep = 1;
+				isWalking = false;
+				return;
+			}
+			exhangeSupportLegSide();
+			time = 0;
+		}
+		if (time == 0) {
+			if (!willStop) {
 				linearInvertedPendulum.optimizeStep(
 					isFirstStep,
 					supportingSide,
 					currentGait);
 			}
-		}
-		if (remainingStep <= 0)
-		{
-			onStop();
-			return;
 		}
 		time += dt;
 	}
@@ -127,9 +125,12 @@ class WalkGeneratorImpl : public WalkGenerator
 		supportingSide = LegSide::RIGHT;
 		remainingStep = predictionStepNum;
 	}
-	void onStop() {
-		reset();
+	void onPhaseStart()
+	{
 	}
+	void onPhaseEnd() {
+	}
+
 	void exhangeSupportLegSide() {
 		supportingSide = supportingSide == LegSide::RIGHT ? LegSide::LEFT : LegSide::RIGHT;
 	}

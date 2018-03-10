@@ -28,6 +28,7 @@ class JointRepositoryImpl : public JointRepository
 		  initialized(false)
 	{
 		resetTargetJointAngles();
+		enable();
 	}
 
 	void setCurrentJointAngle(int id, JointAngle angle) override
