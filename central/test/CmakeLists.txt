@@ -1,32 +1,30 @@
 cmake_minimum_required(VERSION 2.8)
-set(CMAKE_CXX_COMPILER /usr/bin/g++)
-set(CMAKE_C_COMPILER /usr/bin/gcc)
 project (VanillaCoreTest)
 
 add_definitions("-Wall -std=c++14")
 
 set(SRC ${CMAKE_SOURCE_DIR}/../src)
-set(THIRDPARTY ${CMAKE_SOURCE_DIR}/../../thirdparty)
-set(GTEST_ROOT ${THIRDPARTY}/googletest)
+set(DEPENDENCIES /opt/dependencies)
+set(GTEST_ROOT ${DEPENDENCIES}/googletest)
 
 include_directories(
   ${GTEST_ROOT}/googletest/include
   ${GTEST_ROOT}/googlemock/include
 )
 include_directories(
-  ${THIRDPARTY}/eigen
-  ${THIRDPARTY}/boost/stage/include
-  ${THIRDPARTY}/mraa/include
-  ${THIRDPARTY}/websocketpp
-  ${THIRDPARTY}/json
-  ${THIRDPARTY}/yaml-cpp/include
+  ${DEPENDENCIES}/eigen
+  ${DEPENDENCIES}/boost/include
+  ${DEPENDENCIES}/mraa/include
+  ${DEPENDENCIES}/websocketpp/include
+  ${DEPENDENCIES}/json
+  ${DEPENDENCIES}/yaml-cpp/include
 )
 include_directories(
   mock
   ${SRC}
   ${SRC}/api
   ${SRC}/api/i2c
-  ${SRC}/api/i2c/I2Cdev
+  // ${SRC}/api/i2c/I2Cdev
   ${SRC}/api/i2c/mpu
   ${SRC}/api/i2c/mpu/mpu6050
   ${SRC}/api/i2c/pwmdriver
@@ -58,9 +56,8 @@ include_directories(
 )
 
 link_directories(
-  ${GTEST_ROOT}/build/googlemock
-  ${GTEST_ROOT}/build/googlemock/gtest
-  ${THIRDPARTY}/libs/yaml-cpp/x86
+  ${GTEST_ROOT}/lib
+  ${DEPENDENCIES}/yaml-cpp/lib
 )
 
 add_executable(Test

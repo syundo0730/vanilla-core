@@ -22,6 +22,7 @@
  *****************************/
 
 #include "Adafruit_PWMServoDriver.h"
+#include "I2Cdev.h"
 #include "Timer.h"
 #include <iostream>
 

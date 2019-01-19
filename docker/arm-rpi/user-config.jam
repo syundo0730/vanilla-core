@@ -1,0 +1,13 @@
+using gcc : arm
+  : arm-linux-gnueabihf-g++
+  : <compileflags>--sysroot=/opt/arm-rpi-4.9.3-linux-gnueabihf/arm-linux-gnueabihf/sysroot
+  <cxxflags>-I/opt/arm-rpi-4.9.3-linux-gnueabihf/arm-linux-gnueabihf/sysroot/usr/include
+  <cxxflags>-I/opt/arm-rpi-4.9.3-linux-gnueabihf/arm-linux-gnueabihf/include/c++/4.9.3
+  ;
+
+using python : 2.7
+  : /usr/bin/python
+  : /opt/arm-rpi-4.9.3-linux-gnueabihf
+  /opt/arm-rpi-4.9.3-linux-gnueabihf/arm-linux-gnueabihf/python2.7
+  /opt/arm-rpi-4.9.3-linux-gnueabihf/python2.7
+  ;

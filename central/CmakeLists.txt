@@ -1,18 +1,18 @@
 cmake_minimum_required(VERSION 2.8)
-set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-c++)
+set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-g++)
 project (VanillaCore)
 
 add_definitions("-Wall -std=c++14")
 
-set(THIRDPARTY ${CMAKE_SOURCE_DIR}/../thirdparty)
+set(DEPENDENCIES /opt/dependencies)
 
 include_directories(
-  ${THIRDPARTY}/eigen
-  ${THIRDPARTY}/boost/stage/include
-  ${THIRDPARTY}/mraa/include
-  ${THIRDPARTY}/websocketpp
-  ${THIRDPARTY}/json
-  ${THIRDPARTY}/yaml-cpp/include
+  ${DEPENDENCIES}/eigen
+  ${DEPENDENCIES}/boost/include
+  ${DEPENDENCIES}/mraa/include
+  ${DEPENDENCIES}/websocketpp/include
+  ${DEPENDENCIES}/json
+  ${DEPENDENCIES}/yaml-cpp/include
 )
 include_directories(
   src
@@ -52,9 +52,9 @@ include_directories(
 )
 
 link_directories(
-  ${THIRDPARTY}/libs/boost/arm
-  ${THIRDPARTY}/libs/mraa/arm
-  ${THIRDPARTY}/libs/yaml-cpp/arm
+  ${DEPENDENCIES}/boost/lib
+  ${DEPENDENCIES}/mraa/lib
+  ${DEPENDENCIES}/yaml-cpp/lib
 )
 
 add_executable(Main

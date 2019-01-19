@@ -25,7 +25,6 @@
 #define _ADAFRUIT_PWM_SERVO_DRIVER_H
 
 #include <memory>
-#include "I2Cdev.h"
 #include <cmath>
 
 #define PCA9685_ADDRESS 0x40
@@ -45,6 +44,8 @@
 #define ALLLED_ON_H 0xFB
 #define ALLLED_OFF_L 0xFC
 #define ALLLED_OFF_H 0xFD
+
+class I2Cdev;
 
 class Adafruit_PWMServoDriver
 {
